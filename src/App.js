@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import ProfilePage from "./pages/ProfilePage";
 import './App.css';
 
 const App = () => {
@@ -16,8 +20,12 @@ const App = () => {
   };
 
   return (
+    <Router>
     <div className="app-container">
       <Navbar />
+      <Routes>
+      <Route path="/" element={
+        <>
       <div className="hero-section">
         <div className="hero-content">
           <h1>Welcome to E-Buddy</h1>
@@ -91,7 +99,14 @@ const App = () => {
 
       <Footer />
       <Chatbot />
-    </div>
+      </>
+      } />
+      <Route path="/profile" element={<ProfilePage />} />
+      <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Routes>
+        </div>
+    </Router>
   );
 };
 
