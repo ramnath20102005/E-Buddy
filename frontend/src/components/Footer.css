@@ -1,0 +1,12 @@
+/* Footer.css */
+.footer {
+  background: rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  text-align: center;
+}
+
+.footer p {
+  font-size: 14px;
+  color: #ccc;
+  margin: 0;
+}
