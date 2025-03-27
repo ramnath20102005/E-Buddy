@@ -18,7 +18,7 @@ const Profile = () => {
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
 
-  const defaultProfileImage = '/default-profile.jpg';
+  const defaultProfileImage = '../assets/images/default-profile.jpg';
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -94,12 +94,20 @@ const Profile = () => {
     navigate('/login');
   };
 
+  // Helper function to clean array display
+  const cleanArrayDisplay = (arr) => {
+    if (!Array.isArray(arr)) return 'None specified';
+    return arr.map(item => item.replace(/["\[\]]/g, '')).join(', ') || 'None specified';
+  };
+
   return (
     <Container className="profile-container">
       <Card className="profile-card">
         <Card.Body>
-          <Row>
-            <Col md={3} className="profile-section">
+          {/* Top Section - Profile and Stats Side by Side */}
+          <Row className="top-section">
+            {/* Left Column - Profile Section */}
+            <Col md={4} className="profile-section">
               <div className="profile-image-wrapper">
                 <Image
                   src={profileImage || defaultProfileImage}
@@ -108,31 +116,42 @@ const Profile = () => {
                   alt="Profile"
                 />
               </div>
-              <p className="profile-email mt-2">{email}</p>
-              {!isEditing && (
-                <div className="d-flex flex-column gap-2">
-                  <Button variant="link" className="edit-btn" onClick={() => setIsEditing(true)}>
-                    Edit Profile
-                  </Button>
-                  <Button variant="danger" className="logout-btn" onClick={handleLogout}>
-                    Logout
-                  </Button>
-                </div>
-              )}
+              <h5 className="profile-name">{name || 'User Name'}</h5>
+              <p className="profile-email">{email}</p>
+              
+              <div className="profile-actions">
+                {!isEditing ? (
+                  <>
+                    <Button className="edit-btn" onClick={() => setIsEditing(true)}>
+                      Edit Profile
+                    </Button>
+                    <Button className="logout-btn" onClick={handleLogout}>
+                      Logout
+                    </Button>
+                  </>
+                ) : (
+                  <div className="d-flex gap-2">
+                    <Button variant="primary" type="submit" className="save-btn" form="editForm">
+                      Save Changes
+                    </Button>
+                    <Button variant="secondary" className="cancel-btn" onClick={() => setIsEditing(false)}>
+                      Cancel
+                    </Button>
+                  </div>
+                )}
+              </div>
             </Col>
 
+            {/* Right Column - Stats Section (hidden when editing) */}
             {!isEditing && (
-              <Col md={9}>
+              <Col md={8} className="stats-section">
                 <Row>
                   <Col md={4}>
                     <Card className="stat-card">
                       <Card.Body>
                         <Card.Title>Progress</Card.Title>
-                        <ProgressBar
-                          now={75}
-                          label={`${75}%`}
-                          className="custom-progress-bar" // Updated class name
-                        />
+                        <ProgressBar now={75} label={`${75}%`} className="custom-progress-bar" />
+                        <Card.Text className="stat-value mt-2">75% Complete</Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
@@ -140,15 +159,15 @@ const Profile = () => {
                     <Card className="stat-card">
                       <Card.Body>
                         <Card.Title>Courses Accessed</Card.Title>
-                        <Card.Text className="stat-value">5</Card.Text> {/* Updated class name */}
+                        <Card.Text className="stat-value">5 Courses</Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
                   <Col md={4}>
                     <Card className="stat-card">
                       <Card.Body>
-                        <Card.Title>Tracking History</Card.Title>
-                        <Card.Text className="stat-value">Recently accessed chats</Card.Text> {/* Updated class name */}
+                        <Card.Title>Chat History</Card.Title>
+                        <Card.Text className="stat-value">Recent Chats</Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
@@ -157,68 +176,101 @@ const Profile = () => {
             )}
           </Row>
 
-          <Row className="mt-4">
+          {/* Bottom Section - Personal Information (full width) */}
+          <Row className="personal-info-section">
             <Col>
               {isEditing ? (
-                <Form className="edit-profile-form" onSubmit={handleSubmit}>
+                <Form id="editForm" className="edit-profile-form" onSubmit={handleSubmit}>
                   {error && <Alert variant="danger">{error}</Alert>}
                   {success && <Alert variant="success">{success}</Alert>}
-                  <Form.Group controlId="profileImage" className="mb-3">
-                    <Form.Label>Profile Image</Form.Label>
-                    <Form.Control type="file" accept="image/*" onChange={handleImageChange} />
-                  </Form.Group>
-                  <Form.Group controlId="name" className="mb-3">
-                    <Form.Label>Name</Form.Label>
-                    <Form.Control type="text" value={name} onChange={(e) => setName(e.target.value)} />
-                  </Form.Group>
-                  <Form.Group controlId="bio" className="mb-3">
-                    <Form.Label>Bio</Form.Label>
-                    <Form.Control as="textarea" rows={3} value={bio} onChange={(e) => setBio(e.target.value)} />
-                  </Form.Group>
-                  <Form.Group controlId="skills" className="mb-3">
-                    <Form.Label>Skills</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={skills.join(', ')}
-                      onChange={(e) => setSkills(e.target.value.split(',').map(skill => skill.trim()))}
-                    />
-                  </Form.Group>
-                  <Form.Group controlId="interests" className="mb-3">
-                    <Form.Label>Interests</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={interests.join(', ')}
-                      onChange={(e) => setInterests(e.target.value.split(',').map(interest => interest.trim()))}
-                    />
-                  </Form.Group>
-                  <Form.Group controlId="certifications" className="mb-3">
-                    <Form.Label>Certifications</Form.Label>
-                    <Form.Control
-                      type="text"
-                      value={certifications.join(', ')}
-                      onChange={(e) => setCertifications(e.target.value.split(',').map(cert => cert.trim()))}
-                    />
-                  </Form.Group>
-                  <div className="d-flex gap-2">
-                    <Button variant="primary" type="submit" className="save-btn">
-                      Save Changes
-                    </Button>
-                    <Button variant="secondary" onClick={() => setIsEditing(false)} className="cancel-btn">
-                      Cancel
-                    </Button>
-                  </div>
+                  
+                  <Row>
+                    <Col md={6}>
+                      <Form.Group controlId="profileImage" className="mb-4">
+                        <Form.Label className="form-label">Profile Image</Form.Label>
+                        <Form.Control 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handleImageChange}
+                          className="form-control-file"
+                        />
+                      </Form.Group>
+                      
+                      <Form.Group controlId="name" className="mb-4">
+                        <Form.Label className="form-label">Name</Form.Label>
+                        <Form.Control 
+                          type="text" 
+                          value={name} 
+                          onChange={(e) => setName(e.target.value)} 
+                          className="form-input"
+                        />
+                      </Form.Group>
+                      
+                      <Form.Group controlId="bio" className="mb-4">
+                        <Form.Label className="form-label">Bio</Form.Label>
+                        <Form.Control 
+                          as="textarea" 
+                          rows={4} 
+                          value={bio} 
+                          onChange={(e) => setBio(e.target.value)}
+                          className="form-textarea"
+                        />
+                      </Form.Group>
+                    </Col>
+                    
+                    <Col md={6}>
+                      <Form.Group controlId="skills" className="mb-4">
+                        <Form.Label className="form-label">Skills (comma separated)</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={Array.isArray(skills) ? skills.join(', ') : skills}
+                          onChange={(e) => setSkills(e.target.value.split(',').map(skill => skill.trim()))}
+                          className="form-input"
+                          placeholder="e.g. JavaScript, React, Node.js"
+                        />
+                      </Form.Group>
+                      
+                      <Form.Group controlId="interests" className="mb-4">
+                        <Form.Label className="form-label">Interests (comma separated)</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={Array.isArray(interests) ? interests.join(', ') : interests}
+                          onChange={(e) => setInterests(e.target.value.split(',').map(interest => interest.trim()))}
+                          className="form-input"
+                          placeholder="e.g. Hiking, Reading, Music"
+                        />
+                      </Form.Group>
+                      
+                      <Form.Group controlId="certifications" className="mb-4">
+                        <Form.Label className="form-label">Certifications (comma separated)</Form.Label>
+                        <Form.Control
+                          type="text"
+                          value={Array.isArray(certifications) ? certifications.join(', ') : certifications}
+                          onChange={(e) => setCertifications(e.target.value.split(',').map(cert => cert.trim()))}
+                          className="form-input"
+                          placeholder="e.g. AWS Certified, Google Analytics"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
                 </Form>
               ) : (
-                <>
+                <div className="info-display">
                   <h4 className="section-title">About Me</h4>
-                  <p className="bio-text">{bio}</p> {/* Updated class name */}
+                  <p className="bio-text">{bio || 'No bio available'}</p>
+                  
                   <h4 className="section-title">Skills</h4>
-                  <p className="bio-text">{skills.join(', ')}</p> {/* Updated class name */}
+                  <p className="bio-text">{cleanArrayDisplay(skills)}</p>
+                  
                   <h4 className="section-title">Interests</h4>
-                  <p className="bio-text">{interests.join(', ')}</p> {/* Updated class name */}
+                  <p className="bio-text">{cleanArrayDisplay(interests)}</p>
+                  
                   <h4 className="section-title">Certifications</h4>
-                  <p className="bio-text">{certifications.join(', ')}</p> {/* Updated class name */}
-                </>
+                  <p className="bio-text">{cleanArrayDisplay(certifications)}</p>
+                  
+                  <h4 className="section-title">Achievements</h4>
+                  <p className="bio-text">{cleanArrayDisplay(achievements)}</p>
+                </div>
               )}
             </Col>
           </Row>

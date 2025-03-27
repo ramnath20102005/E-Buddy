@@ -12,14 +12,12 @@ const getProfile = asyncHandler(async (req, res) => {
     throw new Error('User not found');
   }
 
-  // ✅ Ensure default profile image is used when missing
-  user.profileImage = user.profileImage || '/default-profile.jpg';
-
+  // Remove default image assignment - let frontend handle it
+  // Just return the user data as-is
   res.json(user);
 });
 
-
-// @desc    Update user profile (Now Supports Base64 Image)
+// @desc    Update user profile
 // @route   PUT /api/profile
 // @access  Private
 const updateProfile = asyncHandler(async (req, res) => {
@@ -36,25 +34,31 @@ const updateProfile = asyncHandler(async (req, res) => {
   if (name) user.name = name;
   if (bio) user.bio = bio;
 
-  // Handle skills, interests, and achievements as arrays
+  // Handle array fields
   if (skills) {
-    user.skills = Array.isArray(skills) ? skills : [skills];
+    user.skills = Array.isArray(skills) ? skills : 
+                  typeof skills === 'string' ? skills.split(',').map(s => s.trim()) : 
+                  [];
   }
+  
   if (interests) {
-    user.interests = Array.isArray(interests) ? interests : [interests];
+    user.interests = Array.isArray(interests) ? interests : 
+                    typeof interests === 'string' ? interests.split(',').map(i => i.trim()) : 
+                    [];
   }
+  
   if (achievements) {
-    user.achievements = Array.isArray(achievements) ? achievements : [achievements];
+    user.achievements = Array.isArray(achievements) ? achievements : 
+                       typeof achievements === 'string' ? achievements.split(',').map(a => a.trim()) : 
+                       [];
   }
 
-  // ✅ Store Base64 image directly in the database
-  if (profileImage) {
-    user.profileImage = profileImage; // Expecting Base64 string from frontend
+  // Handle profile image (accepts Base64 or null)
+  if (profileImage !== undefined) {
+    user.profileImage = profileImage || null; // Explicitly set to null if empty
   }
 
-  // Save the updated user
   const updatedUser = await user.save();
-
   res.json(updatedUser);
 });
 

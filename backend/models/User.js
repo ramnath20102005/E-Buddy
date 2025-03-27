@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
     },
     profileImage: {
       type: String, // ✅ Stores Base64 image directly
-      default: "",  // Empty by default
+      default: "../public/default-profile.jpg",  // Empty by default
     },
     bio: {
       type: String,
