@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Navbar from './components/Navbar'; // Friend’s Navbar
-import Footer from './components/Footer'; // Friend’s Footer
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";// Friend’s Navbar
+ // Friend’s Footer
 import Chatbot from './components/Chatbot'; // Friend’s Chatbot
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Profile from './pages/Profile'; // ✅ Profile Page
-import ProfileSetup from './pages/ProfileSetup'; // ✅ Profile Setup Page
+import ProfileSetup from './pages/ProfileSetup';
+import LearningPath from "./pages/LearningPath"; // ✅ Import Learning Path
 import './App.css';
 
 const App = () => {
@@ -30,8 +32,7 @@ const App = () => {
   return (
     <Router>
       <div className="app-container">
-        <Navbar />
-
+      <Navbar />
         <Routes>
           {/* ✅ Home Page */}
           <Route
@@ -102,9 +103,14 @@ const App = () => {
             path="/profile"
             element={isAuthenticated ? <Profile /> : <Navigate to="/login" />}
           />
-        </Routes>
 
-        <Footer />
+          {/* ✅ Protected Learning Path Page */}
+          <Route
+            path="/LearningPath"
+            element={isAuthenticated ? <LearningPath /> : <Navigate to="/login" />}
+          />
+        </Routes>
+            <Footer/>
       </div>
     </Router>
   );

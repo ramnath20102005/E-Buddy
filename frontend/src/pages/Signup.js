@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "../Auth.css"; // Common CSS for both Signup & Login
 
 const Signup = () => {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -15,13 +16,17 @@ const Signup = () => {
 
     try {
       const { data } = await axios.post("http://localhost:5000/api/auth/signup", {
+        name,
         email,
         password,
       });
 
-      // Store only the token
+      // ✅ Store token in localStorage
       localStorage.setItem("token", data.token);
-      
+
+      // ✅ Store userId in sessionStorage for tracking progress
+      sessionStorage.setItem("userId", data.userId);
+
       // Redirect to Profile Setup page after successful signup
       navigate("/profile-setup");
     } catch (err) {
@@ -36,6 +41,15 @@ const Signup = () => {
           <h2 className="auth-title">Create Account</h2>
           {error && <p className="error-message">{error}</p>}
           <form onSubmit={handleSignup} className="auth-form">
+            <div className="input-group">
+              <input
+                type="text"
+                placeholder="Enter Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
             <div className="input-group">
               <input
                 type="email"

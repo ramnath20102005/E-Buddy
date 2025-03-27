@@ -1,9 +1,10 @@
 const express = require('express');
+const router = express.Router();
 const { protect } = require('../middleware/authMiddleware');
 const { getProfile, updateProfile } = require('../controllers/profileController');
-const router = express.Router();
 
-// Profile routes (protected)
-router.route('/').get(protect, getProfile).put(protect, updateProfile);
+router.route('/')
+  .get(protect, getProfile)
+  .put(protect, updateProfile); // Ensure PUT method is properly defined
 
-module.exports = router; // ✅ Ensure you export the router
+module.exports = router;

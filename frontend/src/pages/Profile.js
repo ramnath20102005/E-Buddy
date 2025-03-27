@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Container, Row, Col, ProgressBar, Form, Image, Alert } from 'react-bootstrap';
+import { Button, Card, Container, Row, Col, Form, Image, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../Profile.css';
@@ -16,60 +16,89 @@ const Profile = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const defaultProfileImage = '../assets/images/default-profile.jpg';
+  const defaultProfileImage = '/default-profile.jpg';
 
-  useEffect(() => {
+  const fetchProfile = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
     }
 
-    const fetchProfile = async () => {
-      try {
-        const response = await axios.get('http://localhost:5000/api/profile', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-        const profile = response.data;
-        setProfileImage(profile.profileImage || defaultProfileImage);
-        setName(profile.name || '');
-        setEmail(profile.email || '');
-        setBio(profile.bio || 'No bio available');
-        setSkills(Array.isArray(profile.skills) ? profile.skills : []);
-        setInterests(Array.isArray(profile.interests) ? profile.interests : []);
-        setCertifications(Array.isArray(profile.certifications) ? profile.certifications : []);
-        setAchievements(Array.isArray(profile.achievements) ? profile.achievements : []);
-      } catch (err) {
-        setError('Failed to fetch profile');
+      const profile = response.data;
+      setProfileImage(profile.profileImage || defaultProfileImage);
+      setName(profile.name || '');
+      setEmail(profile.email || '');
+      setBio(profile.bio || 'No bio available');
+      setSkills(Array.isArray(profile.skills) ? profile.skills : []);
+      setInterests(Array.isArray(profile.interests) ? profile.interests : []);
+      setCertifications(Array.isArray(profile.certifications) ? profile.certifications : []);
+      setAchievements(Array.isArray(profile.achievements) ? profile.achievements : []);
+    } catch (err) {
+      setError('Failed to fetch profile: ' + (err.response?.data?.message || err.message));
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login');
       }
-    };
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchProfile();
   }, [navigate]);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-      };
+    if (!file) return;
+
+    // Validate image type and size
+    if (!file.type.match('image.*')) {
+      setError('Please select an image file (JPEG, PNG)');
+      return;
     }
+    
+    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+      setError('Image size should be less than 2MB');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setProfileImage(event.target.result);
+      setError('');
+    };
+    reader.onerror = () => {
+      setError('Failed to read image file');
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
+    setIsLoading(true);
 
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/login');
+        return;
+      }
+
       const profileData = {
-        profileImage,
+        profileImage: profileImage !== defaultProfileImage ? profileImage : null,
         name,
         bio,
         skills,
@@ -78,14 +107,30 @@ const Profile = () => {
         achievements,
       };
 
-      await axios.put('http://localhost:5000/api/profile', profileData, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.put(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/profile`,
+        profileData,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
 
       setSuccess('Profile updated successfully!');
       setIsEditing(false);
+      fetchProfile(); // Refresh the profile data
     } catch (err) {
-      setError('Failed to update profile');
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login');
+      } else {
+        setError(err.response?.data?.message || 'Failed to update profile');
+        console.error('Update error:', err);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -94,19 +139,16 @@ const Profile = () => {
     navigate('/login');
   };
 
-  // Helper function to clean array display
   const cleanArrayDisplay = (arr) => {
     if (!Array.isArray(arr)) return 'None specified';
-    return arr.map(item => item.replace(/["\[\]]/g, '')).join(', ') || 'None specified';
+    return arr.filter(item => item.trim()).join(', ') || 'None specified';
   };
 
   return (
     <Container className="profile-container">
       <Card className="profile-card">
         <Card.Body>
-          {/* Top Section - Profile and Stats Side by Side */}
           <Row className="top-section">
-            {/* Left Column - Profile Section */}
             <Col md={4} className="profile-section">
               <div className="profile-image-wrapper">
                 <Image
@@ -122,19 +164,38 @@ const Profile = () => {
               <div className="profile-actions">
                 {!isEditing ? (
                   <>
-                    <Button className="edit-btn" onClick={() => setIsEditing(true)}>
-                      Edit Profile
+                    <Button 
+                      className="edit-btn" 
+                      onClick={() => setIsEditing(true)}
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Loading...' : 'Edit Profile'}
                     </Button>
-                    <Button className="logout-btn" onClick={handleLogout}>
+                    <Button 
+                      className="logout-btn" 
+                      onClick={handleLogout}
+                      disabled={isLoading}
+                    >
                       Logout
                     </Button>
                   </>
                 ) : (
                   <div className="d-flex gap-2">
-                    <Button variant="primary" type="submit" className="save-btn" form="editForm">
-                      Save Changes
+                    <Button 
+                      variant="primary" 
+                      type="submit" 
+                      className="save-btn" 
+                      form="editForm"
+                      disabled={isLoading}
+                    >
+                      {isLoading ? 'Saving...' : 'Save Changes'}
                     </Button>
-                    <Button variant="secondary" className="cancel-btn" onClick={() => setIsEditing(false)}>
+                    <Button 
+                      variant="secondary" 
+                      className="cancel-btn" 
+                      onClick={() => setIsEditing(false)}
+                      disabled={isLoading}
+                    >
                       Cancel
                     </Button>
                   </div>
@@ -142,32 +203,37 @@ const Profile = () => {
               </div>
             </Col>
 
-            {/* Right Column - Stats Section (hidden when editing) */}
             {!isEditing && (
               <Col md={8} className="stats-section">
+                <h4 className="section-title mb-3">Your Dashboard Overview</h4>
                 <Row>
                   <Col md={4}>
                     <Card className="stat-card">
                       <Card.Body>
-                        <Card.Title>Progress</Card.Title>
-                        <ProgressBar now={75} label={`${75}%`} className="custom-progress-bar" />
-                        <Card.Text className="stat-value mt-2">75% Complete</Card.Text>
+                        <Card.Title>YOUR PROFILE</Card.Title>
+                        <Card.Text className="stat-description">
+                          Keep your profile details updated for better recommendations and networking.
+                        </Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
                   <Col md={4}>
                     <Card className="stat-card">
                       <Card.Body>
-                        <Card.Title>Courses Accessed</Card.Title>
-                        <Card.Text className="stat-value">5 Courses</Card.Text>
+                        <Card.Title>Learning Activity</Card.Title>
+                        <Card.Text className="stat-description">
+                          Track your learning activities and see your course engagement.
+                        </Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
                   <Col md={4}>
                     <Card className="stat-card">
                       <Card.Body>
-                        <Card.Title>Chat History</Card.Title>
-                        <Card.Text className="stat-value">Recent Chats</Card.Text>
+                        <Card.Title>Recent Career Insights</Card.Title>
+                        <Card.Text className="stat-description">
+                          Get personalized career suggestions and skill-building insights.
+                        </Card.Text>
                       </Card.Body>
                     </Card>
                   </Col>
@@ -176,7 +242,6 @@ const Profile = () => {
             )}
           </Row>
 
-          {/* Bottom Section - Personal Information (full width) */}
           <Row className="personal-info-section">
             <Col>
               {isEditing ? (
@@ -188,14 +253,26 @@ const Profile = () => {
                     <Col md={6}>
                       <Form.Group controlId="profileImage" className="mb-4">
                         <Form.Label className="form-label">Profile Image</Form.Label>
-                        <Form.Control 
-                          type="file" 
-                          accept="image/*" 
-                          onChange={handleImageChange}
-                          className="form-control-file"
-                        />
+                        <div className="d-flex align-items-center">
+                          <Form.Control 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={handleImageChange}
+                            className="form-control-file"
+                            disabled={isLoading}
+                          />
+                          <Button 
+                            variant="danger" 
+                            size="sm" 
+                            onClick={() => setProfileImage(defaultProfileImage)} 
+                            className="remove-btn ms-2"
+                            disabled={isLoading}
+                          >
+                            Remove Profile Image
+                          </Button>
+                        </div>
                       </Form.Group>
-                      
+
                       <Form.Group controlId="name" className="mb-4">
                         <Form.Label className="form-label">Name</Form.Label>
                         <Form.Control 
@@ -203,6 +280,7 @@ const Profile = () => {
                           value={name} 
                           onChange={(e) => setName(e.target.value)} 
                           className="form-input"
+                          disabled={isLoading}
                         />
                       </Form.Group>
                       
@@ -214,6 +292,7 @@ const Profile = () => {
                           value={bio} 
                           onChange={(e) => setBio(e.target.value)}
                           className="form-textarea"
+                          disabled={isLoading}
                         />
                       </Form.Group>
                     </Col>
@@ -227,6 +306,7 @@ const Profile = () => {
                           onChange={(e) => setSkills(e.target.value.split(',').map(skill => skill.trim()))}
                           className="form-input"
                           placeholder="e.g. JavaScript, React, Node.js"
+                          disabled={isLoading}
                         />
                       </Form.Group>
                       
@@ -238,17 +318,19 @@ const Profile = () => {
                           onChange={(e) => setInterests(e.target.value.split(',').map(interest => interest.trim()))}
                           className="form-input"
                           placeholder="e.g. Hiking, Reading, Music"
+                          disabled={isLoading}
                         />
                       </Form.Group>
                       
                       <Form.Group controlId="certifications" className="mb-4">
-                        <Form.Label className="form-label">Certifications (comma separated)</Form.Label>
+                        <Form.Label className="form-label">Achievements (comma separated)</Form.Label>
                         <Form.Control
                           type="text"
                           value={Array.isArray(certifications) ? certifications.join(', ') : certifications}
                           onChange={(e) => setCertifications(e.target.value.split(',').map(cert => cert.trim()))}
                           className="form-input"
                           placeholder="e.g. AWS Certified, Google Analytics"
+                          disabled={isLoading}
                         />
                       </Form.Group>
                     </Col>
@@ -265,11 +347,8 @@ const Profile = () => {
                   <h4 className="section-title">Interests</h4>
                   <p className="bio-text">{cleanArrayDisplay(interests)}</p>
                   
-                  <h4 className="section-title">Certifications</h4>
-                  <p className="bio-text">{cleanArrayDisplay(certifications)}</p>
-                  
                   <h4 className="section-title">Achievements</h4>
-                  <p className="bio-text">{cleanArrayDisplay(achievements)}</p>
+                  <p className="bio-text">{cleanArrayDisplay(certifications)}</p>
                 </div>
               )}
             </Col>

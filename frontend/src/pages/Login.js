@@ -19,9 +19,12 @@ const Login = () => {
         password,
       });
 
-      // Store only the token
+      // ✅ Store token in localStorage
       localStorage.setItem("token", data.token);
-      
+
+      // ✅ Store userId in sessionStorage for tracking progress
+      sessionStorage.setItem("userId", data.userId);
+
       // Redirect to Profile Setup if it's the first login, else go to Profile page
       navigate("/profile");
     } catch (err) {

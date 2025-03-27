@@ -3,6 +3,11 @@ const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema(
   {
+    userId: {
+      type: String,
+      unique: true,
+      required: true,
+    },
     name: {
       type: String,
       trim: true,
@@ -21,7 +26,7 @@ const userSchema = new mongoose.Schema(
     },
     profileImage: {
       type: String, // ✅ Stores Base64 image directly
-      default: "../public/default-profile.jpg",  // Empty by default
+      default: "",  // Empty by default
     },
     bio: {
       type: String,

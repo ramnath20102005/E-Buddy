@@ -1,22 +1,30 @@
-const asyncHandler = require('express-async-handler');
-const User = require('../models/User');
-const generateToken = require('../utils/generateToken');
+const asyncHandler = require("express-async-handler");
+const User = require("../models/User");
+const generateToken = require("../utils/generateToken");
+
+// 🔹 Generate unique userId
+const generateUserId = () => `user_${Math.random().toString(36).substr(2, 9)}`;
 
 // @desc    Register a new user
 // @route   POST /api/auth/signup
 // @access  Public
 const signup = asyncHandler(async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
 
   // Check if user already exists
   const userExists = await User.findOne({ email });
   if (userExists) {
     res.status(400);
-    throw new Error('User already exists');
+    throw new Error("User already exists");
   }
+
+  // Generate unique userId (stored permanently)
+  const userId = generateUserId();
 
   // Create user
   const user = await User.create({
+    userId, // ✅ Storing generated userId
+    name,
     email,
     password,
   });
@@ -24,12 +32,13 @@ const signup = asyncHandler(async (req, res) => {
   if (user) {
     res.status(201).json({
       _id: user._id,
-      email: user.email,
+      userId: user.userId, // ✅ Send userId for history tracking
+      name: user.name,
       token: generateToken(user._id),
     });
   } else {
     res.status(400);
-    throw new Error('Invalid user data');
+    throw new Error("Invalid user data");
   }
 });
 
@@ -44,15 +53,14 @@ const login = asyncHandler(async (req, res) => {
   if (user && (await user.matchPassword(password))) {
     res.json({
       _id: user._id,
+      userId: user.userId, // ✅ Send userId for history tracking
       name: user.name || "",
-      email: user.email,
-      token: generateToken(user._id), // Ensure token is sent
+      token: generateToken(user._id),
     });
   } else {
     res.status(401);
     throw new Error("Invalid email or password");
   }
 });
-
 
 module.exports = { signup, login };
