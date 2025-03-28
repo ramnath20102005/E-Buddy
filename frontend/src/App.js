@@ -9,7 +9,8 @@ import Profile from './pages/Profile';
 import ProfileSetup from './pages/ProfileSetup';
 import LearningPath from "./pages/LearningPath";
 import StudyMaterials from "./pages/StudyMaterials";
-import CareerPath from "./pages/CareerPath"; // ✅ NEW: Import Study Materials page
+import CareerPath from "./pages/CareerPath";
+import Landing from './pages/Landing';
 
 import './App.css';
 
@@ -18,107 +19,121 @@ const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated
     const token = localStorage.getItem('token');
     setIsAuthenticated(!!token);
   }, []);
 
   const nextSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % 3); // 3 slides
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % 3);
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prevIndex) => (prevIndex - 1 + 3) % 3); // 3 slides
+    setCurrentIndex((prevIndex) => (prevIndex - 1 + 3) % 3);
+  };
+
+  const logout = () => {
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('userId');
+    setIsAuthenticated(false);
   };
 
   return (
     <Router>
       <div className="app-container">
-        <Navbar />
+        <Navbar isAuthenticated={isAuthenticated} logout={logout} />
         <Routes>
-          {/* ✅ Home Page */}
+          {/* Default Route */}
           <Route
             path="/"
+            element={<Navigate to={isAuthenticated ? "/home" : "/landing"} />}
+          />
+
+          {/* Landing Page */}
+          <Route
+            path="/landing"
+            element={isAuthenticated ? <Navigate to="/home" /> : <Landing />}
+          />
+
+          {/* Main Home Page (Protected) */}
+          <Route
+            path="/home"
             element={
-              <>
-                <div className="hero-section">
-                  <div className="hero-content">
-                    <h1>Welcome to E-Buddy</h1>
-                    <p>Your ultimate companion for learning and career growth.</p>
-                  </div>
-                </div>
-
-                {/* Carousel Section */}
-                <div className="carousel-section">
-                  <div className="carousel">
-                    <div
-                      className="carousel-inner"
-                      style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-                    >
-                      <div className="carousel-item">
-                        <img src="/carousel_images/car_image1.jpg" alt="Slide 1" />
-                      </div>
-                      <div className="carousel-item">
-                        <img src="/carousel_images/car_image2.jpg" alt="Slide 2" />
-                      </div>
-                      <div className="carousel-item">
-                        <img src="/carousel_images/car_image3.jpg" alt="Slide 3" />
-                      </div>
-                    </div>
-                    <button className="carousel-control prev" onClick={prevSlide}>
-                      &#10094;
-                    </button>
-                    <button className="carousel-control next" onClick={nextSlide}>
-                      &#10095;
-                    </button>
-                  </div>
-                </div>
-
-                {/* Features Section */}
-                <div className="features-section">
-                  <div className="outer-rectangle">
-                    <h2 className="section-header">Features</h2>
-                    <div className="features-grid">
-                      <div className="feature-box">Personalized Learning</div>
-                      <div className="feature-box">AI Career Counseling</div>
-                      <div className="feature-box">Interactive Chatbot</div>
+              isAuthenticated ? (
+                <>
+                  <div className="hero-section">
+                    <div className="hero-content">
+                      <h1>Welcome to E-Buddy</h1>
+                      <p>Your ultimate companion for learning and career growth.</p>
                     </div>
                   </div>
-                </div>
-
-                <Chatbot />
-              </>
+                  <div className="carousel-section">
+                    <div className="carousel">
+                      <div
+                        className="carousel-inner"
+                        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                      >
+                        <div className="carousel-item">
+                          <img src="/carousel_images/car_image1.jpg" alt="Slide 1" />
+                        </div>
+                        <div className="carousel-item">
+                          <img src="/carousel_images/car_image2.jpg" alt="Slide 2" />
+                        </div>
+                        <div className="carousel-item">
+                          <img src="/carousel_images/car_image3.jpg" alt="Slide 3" />
+                        </div>
+                      </div>
+                      <button className="carousel-control prev" onClick={prevSlide}>
+                        ❮
+                      </button>
+                      <button className="carousel-control next" onClick={nextSlide}>
+                        ❯
+                      </button>
+                    </div>
+                  </div>
+                  <div className="features-section">
+                    <div className="outer-rectangle">
+                      <h2 className="section-header">Features</h2>
+                      <div className="features-grid">
+                        <div className="feature-box">Personalized Learning</div>
+                        <div className="feature-box">AI Career Counseling</div>
+                        <div className="feature-box">Interactive Chatbot</div>
+                      </div>
+                    </div>
+                  </div>
+                  <Chatbot />
+                </>
+              ) : (
+                <Navigate to="/landing" />
+              )
             }
           />
 
-          {/* ✅ Authentication Pages */}
-          <Route path="/login" element={<Login />} />
+          {/* Authentication Pages */}
+          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
           <Route path="/signup" element={<Signup />} />
 
-          {/* ✅ Protected Pages */}
+          {/* Protected Pages */}
           <Route
             path="/profile-setup"
-            element={isAuthenticated ? <ProfileSetup /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <ProfileSetup /> : <Navigate to="/landing" />}
           />
           <Route
             path="/profile"
-            element={isAuthenticated ? <Profile /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <Profile /> : <Navigate to="/landing" />}
           />
           <Route
             path="/learning-path"
-            element={isAuthenticated ? <LearningPath /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <LearningPath /> : <Navigate to="/landing" />}
           />
-          {/* ✅ NEW: Protected Study Materials Page */}
           <Route
             path="/study-materials"
-            element={isAuthenticated ? <StudyMaterials /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <StudyMaterials /> : <Navigate to="/landing" />}
           />
-         <Route
+          <Route
             path="/careerpath"
-            element={isAuthenticated ? <CareerPath /> : <Navigate to="/login" />}
+            element={isAuthenticated ? <CareerPath /> : <Navigate to="/landing" />}
           />
         </Routes>
-
         <Footer />
       </div>
     </Router>

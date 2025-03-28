@@ -28,12 +28,9 @@ const StudyMaterials = () => {
   const [topic, setTopic] = useState('');
   const [materialType, setMaterialType] = useState('summarize');
   const [response, setResponse] = useState('');
-  const [history, setHistory] = useState([]);
-  const [activeSection, setActiveSection] = useState('generate');
   const [animatedResponse, setAnimatedResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
   const [additionalOptions, setAdditionalOptions] = useState({ 
     bullets: 5, 
     count: 5, 
@@ -76,8 +73,6 @@ const StudyMaterials = () => {
     
     setIsLoading(true);
     setError('');
-    setActiveSection('generate');
-    setSelectedHistoryItem(null);
 
     try {
       const token = localStorage.getItem('token');
@@ -113,34 +108,6 @@ const StudyMaterials = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const fetchHistory = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      console.error("❌ Error: No authentication token found");
-      return;
-    }
-
-    try {
-      const { data } = await axios.get(
-        "http://localhost:5000/api/ai/study-material/history",
-        {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        }
-      );
-      setHistory(data);
-      setActiveSection('history');
-      setSelectedHistoryItem(null);
-    } catch (error) {
-      console.error("❌ Error fetching history:", error);
-    }
-  };
-
-  const handleHistoryItemClick = (item) => {
-    setSelectedHistoryItem(item);
   };
 
   const handleOptionChange = (e) => {
@@ -217,105 +184,50 @@ const StudyMaterials = () => {
             <button type="submit" disabled={isLoading}>
               {isLoading ? 'Generating...' : 'Generate Material'}
             </button>
-            <button 
-              type="button" 
-              onClick={fetchHistory} 
-              className="history-button"
-            >
-              Search History
-            </button>
           </form>
           {error && <div className="error-message">{error}</div>}
         </div>
 
         <div className="right-section">
-          {activeSection === 'generate' && (
-            <div className="response-content">
-              {response ? (
-                <div className="response-box">
-                  <h3>
-                    Generated {materialType === 'quiz' ? 'Quiz' : 
-                             materialType === 'flashcards' ? 'Flashcards' : 'Summary'}:
-                  </h3>
-                  <pre className="animated-text" style={{ whiteSpace: 'pre-wrap' }}>
-                    {animatedResponse}
-                  </pre>
-                  <div style={{ marginTop: '20px' }}>
-                    <PDFDownloadLink
-                      document={<PdfDocument response={response} materialType={materialType} topic={topic} />}
-                      fileName={`${topic}-${materialType}.pdf`}
-                    >
-                      {({ loading: pdfLoading }) => (
-                        <button 
-                          style={{
-                            backgroundColor: '#2196F3',
-                            color: 'white',
-                            padding: '10px 15px',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                          }}
-                          disabled={pdfLoading || isLoading}
-                        >
-                          {pdfLoading ? 'Creating PDF...' : '📥 Download as PDF'}
-                        </button>
-                      )}
-                    </PDFDownloadLink>
-                  </div>
-                </div>
-              ) : (
-                <div className="placeholder-text">
-                  Your study material will appear here
-                </div>
-              )}
-            </div>
-          )}
-
-          {activeSection === 'history' && (
-            <div className="history-content">
-              <h3>Past Study Material Requests:</h3>
-              <div className="history-scroll">
-                {selectedHistoryItem ? (
-                  <div className="history-detail-view">
-                    <button 
-                      className="back-button" 
-                      onClick={() => setSelectedHistoryItem(null)}
-                    >
-                      ← Back to list
-                    </button>
-                    <div className="history-item-detail">
-                      <div className="history-details">
-                        <strong>Topic:</strong> {selectedHistoryItem.topic}<br />
-                        <strong>Type:</strong> {selectedHistoryItem.materialType}<br />
-                        <strong>Options:</strong> {JSON.stringify(selectedHistoryItem.additionalOptions)}
-                      </div>
-                      <pre className="history-response" style={{ whiteSpace: 'pre-wrap' }}>
-                        {cleanResponseText(selectedHistoryItem.responseText)}
-                      </pre>
-                    </div>
-                  </div>
-                ) : (
-                  history.length > 0 ? (
-                    history.map((entry, index) => (
-                      <div 
-                        key={index} 
-                        className="history-item" 
-                        onClick={() => handleHistoryItemClick(entry)}
+          <div className="response-content">
+            {response ? (
+              <div className="response-box">
+                <h3>
+                  Generated {materialType === 'quiz' ? 'Quiz' : 
+                           materialType === 'flashcards' ? 'Flashcards' : 'Summary'}:
+                </h3>
+                <pre className="animated-text" style={{ whiteSpace: 'pre-wrap' }}>
+                  {animatedResponse}
+                </pre>
+                <div style={{ marginTop: '20px' }}>
+                  <PDFDownloadLink
+                    document={<PdfDocument response={response} materialType={materialType} topic={topic} />}
+                    fileName={`${topic}-${materialType}.pdf`}
+                  >
+                    {({ loading: pdfLoading }) => (
+                      <button 
+                        style={{
+                          backgroundColor: '#2196F3',
+                          color: 'white',
+                          padding: '10px 15px',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer'
+                        }}
+                        disabled={pdfLoading || isLoading}
                       >
-                        <div className="history-item-topic">
-                          {entry.topic} ({entry.materialType})
-                        </div>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="placeholder-text">
-                      No study material history available
-                    </div>
-                  )
-                )}
+                        {pdfLoading ? 'Creating PDF...' : '📥 Download as PDF'}
+                      </button>
+                    )}
+                  </PDFDownloadLink>
+                </div>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="placeholder-text">
+                Your study material will appear here
+              </div>
+            )}
+          </div>
         </div>
       </div>
       <Chatbot />

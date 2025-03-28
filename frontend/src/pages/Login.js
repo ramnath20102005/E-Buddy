@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../Auth.css"; // Common CSS for both Signup & Login
+import "../Auth.css";
 
-const Login = () => {
+const Login = ({ setIsAuthenticated }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -19,14 +19,17 @@ const Login = () => {
         password,
       });
 
-      // ✅ Store token in localStorage
+      // Store token in localStorage
       localStorage.setItem("token", data.token);
 
-      // ✅ Store userId in sessionStorage for tracking progress
+      // Store userId in sessionStorage for tracking progress
       sessionStorage.setItem("userId", data.userId);
 
-      // Redirect to Profile Setup if it's the first login, else go to Profile page
-      navigate("/profile");
+      // Update authentication state
+      setIsAuthenticated(true);
+
+      // Redirect to Home Page
+      navigate("/home");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     }
