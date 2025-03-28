@@ -10,8 +10,9 @@ const Navbar = () => {
       </div>
 
       <ul className="nav-links">
-        <li><Link to="/LearningPath">Learning Path</Link></li>
-        <li><Link to="/">Career Guidance</Link></li>
+        <li><Link to="/learning-path">Learning Path</Link></li>
+        <li><Link to="/study-materials">Study Materials</Link></li> {/* New link */}
+        <li><Link to="/careerpath">Career Guidance</Link></li>
         <li><Link to="/signup">Signup</Link></li>
         <li><Link to="/login">Login</Link></li>
       </ul>

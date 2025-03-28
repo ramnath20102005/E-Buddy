@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";// Friend’s Navbar
- // Friend’s Footer
-import Chatbot from './components/Chatbot'; // Friend’s Chatbot
+import Footer from "./components/Footer";
+import Chatbot from './components/Chatbot';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
-import Profile from './pages/Profile'; // ✅ Profile Page
+import Profile from './pages/Profile';
 import ProfileSetup from './pages/ProfileSetup';
-import LearningPath from "./pages/LearningPath"; // ✅ Import Learning Path
+import LearningPath from "./pages/LearningPath";
+import StudyMaterials from "./pages/StudyMaterials";
+import CareerPath from "./pages/CareerPath"; // ✅ NEW: Import Study Materials page
+
 import './App.css';
 
 const App = () => {
@@ -18,7 +20,7 @@ const App = () => {
   useEffect(() => {
     // Check if user is authenticated
     const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token); // If token exists, user is authenticated
+    setIsAuthenticated(!!token);
   }, []);
 
   const nextSlide = () => {
@@ -32,7 +34,7 @@ const App = () => {
   return (
     <Router>
       <div className="app-container">
-      <Navbar />
+        <Navbar />
         <Routes>
           {/* ✅ Home Page */}
           <Route
@@ -42,7 +44,7 @@ const App = () => {
                 <div className="hero-section">
                   <div className="hero-content">
                     <h1>Welcome to E-Buddy</h1>
-                    <p>Your ultimate companion for learning and career growth. Explore courses, get career guidance, and build your future with us.</p>
+                    <p>Your ultimate companion for learning and career growth.</p>
                   </div>
                 </div>
 
@@ -84,7 +86,6 @@ const App = () => {
                   </div>
                 </div>
 
-                {/* Chatbot */}
                 <Chatbot />
               </>
             }
@@ -94,7 +95,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
-          {/* ✅ Protected Profile Pages */}
+          {/* ✅ Protected Pages */}
           <Route
             path="/profile-setup"
             element={isAuthenticated ? <ProfileSetup /> : <Navigate to="/login" />}
@@ -103,14 +104,22 @@ const App = () => {
             path="/profile"
             element={isAuthenticated ? <Profile /> : <Navigate to="/login" />}
           />
-
-          {/* ✅ Protected Learning Path Page */}
           <Route
-            path="/LearningPath"
+            path="/learning-path"
             element={isAuthenticated ? <LearningPath /> : <Navigate to="/login" />}
           />
+          {/* ✅ NEW: Protected Study Materials Page */}
+          <Route
+            path="/study-materials"
+            element={isAuthenticated ? <StudyMaterials /> : <Navigate to="/login" />}
+          />
+         <Route
+            path="/careerpath"
+            element={isAuthenticated ? <CareerPath /> : <Navigate to="/login" />}
+          />
         </Routes>
-            <Footer/>
+
+        <Footer />
       </div>
     </Router>
   );

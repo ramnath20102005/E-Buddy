@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Chatbot from "../components/Chatbot";
 
@@ -10,25 +10,25 @@ const LearningPath = () => {
   const [history, setHistory] = useState([]);
   const [showHistory, setShowHistory] = useState(false);
 
-  // 🔹 Get userId from authentication (sessionStorage)
-  const userId = sessionStorage.getItem("userId");
-
-  // 🔹 Handle Learning Path request
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!userId) {
-      console.error("❌ Error: No authenticated user.");
+    
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error("❌ Error: No authentication token found");
       return;
     }
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/ai/learning-path", {
-        userId, // ✅ Send authenticated userId
-        topic,
-        level,
-        duration,
-      });
+      const { data } = await axios.post(
+        "http://localhost:5000/api/ai/learning-path", 
+        { topic, level, duration },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
 
       setResponse(data.response);
       setTopic("");
@@ -38,15 +38,22 @@ const LearningPath = () => {
     }
   };
 
-  // 🔹 Fetch Learning Path history (only for the authenticated user)
   const fetchHistory = async () => {
-    if (!userId) {
-      console.error("❌ Error: No authenticated user.");
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.error("❌ Error: No authentication token found");
       return;
     }
 
     try {
-      const { data } = await axios.get(`http://localhost:5000/api/ai/learning-path/history/${userId}`);
+      const { data } = await axios.get(
+        "http://localhost:5000/api/ai/learning-path/history",
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      );
       setHistory(data);
       setShowHistory(true);
     } catch (error) {

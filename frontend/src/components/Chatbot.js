@@ -19,23 +19,37 @@ const Chatbot = () => {
     setMessages(updatedMessages);
 
     try {
-      // 🔹 Send message to backend API
-      const response = await axios.post("http://localhost:5000/api/ai/chatbot", { message: userInput });
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Please login first');
+      }
 
-      console.log("🔹 Chatbot Response:", response.data); // Debugging log
+      // Send message to backend API with authorization token
+      const response = await axios.post(
+        "http://localhost:5000/api/ai/chatbot", 
+        { message: userInput },
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
 
-      // 🔹 Extract correct response key
-      const botResponse = response.data.response || "⚠ No response received.";
-
-      // 🔹 Update chat with bot response
+      // Update chat with bot response
+      const botResponse = response.data.response || "I couldn't process that request. Please try again.";
       setMessages([...updatedMessages, { text: botResponse, sender: "bot" }]);
     } catch (error) {
-      console.error("🔴 Chatbot API Error:", error);
-      setMessages([...updatedMessages, { text: "⚠ Error connecting to chatbot.", sender: "bot" }]);
+      console.error("Chatbot API Error:", error);
+      const errorMessage = error.response?.status === 401 
+        ? "Please login to use the chatbot" 
+        : "Error connecting to chatbot. Please try again.";
+      setMessages([...updatedMessages, { text: errorMessage, sender: "bot" }]);
     }
 
     setUserInput("");
   };
+
 
   return (
     <div className="chatbot-container">

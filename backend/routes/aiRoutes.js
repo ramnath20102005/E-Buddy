@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const axios = require("axios");
 const dotenv = require("dotenv");
+const { protect } = require('../middleware/authMiddleware');
 const LearningPathHistory = require("../models/LearningPathHistory");
 const User = require("../models/User");
 
@@ -12,39 +13,35 @@ if (!GEMINI_API_KEY) {
   console.error("❌ Error: Missing GEMINI_API_KEY in environment variables.");
 }
 
-// ✅ Route: Generate Learning Path
-router.post("/learning-path", async (req, res) => {
+async function callGeminiAPI(prompt) {
   try {
-    let { userId, topic, level, duration } = req.body;
-
-    if (!userId || !topic || !level || !duration) {
-      return res.status(400).json({ error: "User ID, topic, level, and duration are required." });
-    }
-
-    // 🔹 Ensure the user exists in the database
-    const user = await User.findOne({ userId });
-    if (!user) {
-      return res.status(404).json({ error: "User not found. Please sign up first." });
-    }
-
-    const prompt = `Give a detailed learning path for ${topic} at a ${level} level for a duration of ${duration}.`;
-
-    console.log("📚 Learning Path Request:", prompt);
-
-    // 🔹 Call Gemini API
     const response = await axios.post(
       `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent?key=${GEMINI_API_KEY}`,
       { contents: [{ parts: [{ text: prompt }] }] },
       { headers: { "Content-Type": "application/json" } }
     );
+    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+  } catch (error) {
+    console.error("🔴 Gemini API Error:", error.response?.data || error.message);
+    throw error;
+  }
+}
 
-    console.log("✅ Gemini API Response:", response.data);
+// Apply authentication to all AI routes
+router.use(protect);
 
-    const responseText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+router.post("/learning-path", async (req, res) => {
+  try {
+    const { topic, level, duration } = req.body;
+    if (!topic || !level || !duration) {
+      return res.status(400).json({ error: "Topic, level, and duration are required." });
+    }
 
-    // 🔹 Store in database
+    const prompt = `Give a detailed learning path for ${topic} at a ${level} level for a duration of ${duration}.`;
+    const responseText = await callGeminiAPI(prompt);
+
     const historyEntry = new LearningPathHistory({
-      userId,
+      userId: req.user._id,
       topic,
       level,
       duration,
@@ -53,65 +50,113 @@ router.post("/learning-path", async (req, res) => {
     });
 
     await historyEntry.save();
-
-    res.json({ response: responseText, userId });
+    res.json({ response: responseText });
   } catch (error) {
-    console.error("🔴 Gemini API Error:", error.response?.data || error.message);
+    console.error("🔴 Error:", error);
     res.status(500).json({ error: "Failed to generate learning path." });
   }
 });
 
-// ✅ Route: Chatbot response
+router.post("/summarize", async (req, res) => {
+  try {
+    const { topic, bullets } = req.body;
+    if (!topic) {
+      return res.status(400).json({ error: "Topic is required." });
+    }
+
+    const prompt = `Provide ${bullets || 5} concise bullet points summarizing ${topic}.`;
+    const response = await callGeminiAPI(prompt);
+    
+    res.json({ summary: response });
+  } catch (error) {
+    console.error("🔴 Error:", error);
+    res.status(500).json({ error: "Failed to generate summary." });
+  }
+});
+
+router.post("/flashcards", async (req, res) => {
+  try {
+    const { topic, count } = req.body;
+    if (!topic) {
+      return res.status(400).json({ error: "Topic is required." });
+    }
+
+    const prompt = `Create ${count || 5} flashcards about ${topic}. Format as: Q: question\nA: answer\n\n`;
+    const response = await callGeminiAPI(prompt);
+    
+    res.json({ flashcards: response });
+  } catch (error) {
+    console.error("🔴 Error:", error);
+    res.status(500).json({ error: "Failed to generate flashcards." });
+  }
+});
+
+router.post("/quiz", async (req, res) => {
+  try {
+    const { topic, questions } = req.body;
+    if (!topic) {
+      return res.status(400).json({ error: "Topic is required." });
+    }
+
+    const prompt = `Generate ${questions || 5} multiple-choice questions about ${topic}. Format each as: Q: [question]\nA) [option1]\nB) [option2]\nC) [option3]\nD) [option4]\nAnswer: [correct letter]\n\n`;
+    const response = await callGeminiAPI(prompt);
+    
+    res.json({ quiz: response });
+  } catch (error) {
+    console.error("🔴 Error:", error);
+    res.status(500).json({ error: "Failed to generate quiz." });
+  }
+});
+
 router.post("/chatbot", async (req, res) => {
   try {
     const { message } = req.body;
-
     if (!message) {
       return res.status(400).json({ error: "Message is required." });
     }
 
     console.log("💬 Chatbot Message Request:", message);
-
-    // 🔹 Call Gemini API
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent?key=${GEMINI_API_KEY}`,
-      { contents: [{ parts: [{ text: message }] }] },
-      { headers: { "Content-Type": "application/json" } }
-    );
-
-    console.log("✅ Gemini API Response:", JSON.stringify(response.data, null, 2));
-
-    // 🔹 Extract text response properly
-    const responseText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
-
+    const responseText = await callGeminiAPI(message);
+    
     res.json({ response: responseText });
   } catch (error) {
-    console.error("🔴 Chatbot API Error:", error.response?.data || error.message);
+    console.error("🔴 Chatbot Error:", error);
     res.status(500).json({ error: "Failed to generate chatbot response." });
   }
 });
 
-// ✅ Route: Fetch Learning Path history for a specific user
-router.get("/learning-path/history/:userId", async (req, res) => {
+router.get("/learning-path/history", async (req, res) => {
   try {
-    const { userId } = req.params;
+    const history = await LearningPathHistory.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    res.json(history);
+  } catch (error) {
+    console.error("🔴 Error:", error);
+    res.status(500).json({ error: "Failed to fetch history." });
+  }
+});
 
-    if (!userId) {
-      return res.status(400).json({ error: "User ID is required." });
+// Additional endpoint for getting user-specific history by type
+router.get("/history/:type", async (req, res) => {
+  try {
+    const { type } = req.params;
+    const validTypes = ['learning-path', 'summarize', 'flashcards', 'quiz', 'chatbot'];
+    
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({ error: "Invalid history type." });
     }
 
-    // 🔹 Ensure the user exists in the database
-    const user = await User.findOne({ userId });
-    if (!user) {
-      return res.status(404).json({ error: "User not found." });
+    let history;
+    if (type === 'learning-path') {
+      history = await LearningPathHistory.find({ userId: req.user._id }).sort({ createdAt: -1 });
+    } else {
+      // Add other history types here if you have separate collections
+      history = []; // Placeholder for other history types
     }
-
-    const history = await LearningPathHistory.find({ userId }).sort({ createdAt: -1 });
 
     res.json(history);
   } catch (error) {
-    console.error("🔴 Error fetching history:", error.message);
-    res.status(500).json({ error: "Failed to fetch learning path history." });
+    console.error("🔴 Error:", error);
+    res.status(500).json({ error: "Failed to fetch history." });
   }
 });
 

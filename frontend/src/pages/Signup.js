@@ -44,7 +44,7 @@ const Signup = () => {
             <div className="input-group">
               <input
                 type="text"
-                placeholder="Enter Name"
+                placeholder="Enter UserName"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
