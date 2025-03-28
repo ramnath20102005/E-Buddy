@@ -37,7 +37,7 @@ router.post("/learning-path", async (req, res) => {
       return res.status(400).json({ error: "Topic, level, and duration are required." });
     }
 
-    const prompt = `Give a detailed learning path for ${topic} at a ${level} level for a duration of ${duration}.`;
+    const prompt = `Give a detailed learning path for ${topic} at a ${level} level for a duration of ${duration} give in structured paragraph(for example if the duration is one hour split it into minute wise) and alsogive the para as topic and content where..topic is time period and topic and content what to do in that topic.Dont use special characters on response for specifying topics and contents`;
     const responseText = await callGeminiAPI(prompt);
 
     const historyEntry = new LearningPathHistory({

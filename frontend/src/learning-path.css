@@ -1,0 +1,249 @@
+/* learning.css */
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2ecc71;
+    --background-color: #f4f6f9;
+    --text-color: #2c3e50;
+    --border-radius: 12px;
+  }
+  
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Arial', sans-serif;
+    background-color: var(--background-color);
+    line-height: 1.6;
+  }
+  
+  .learning-path-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  
+  .learning-path-wrapper {
+    display: flex;
+    width: 100%;
+    max-width: 1200px;
+    background-color: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    overflow: hidden;
+  }
+  
+  .left-section {
+    width: 40%;
+    padding: 30px;
+    background-color: #f9f9fc;
+    border-right: 1px solid #e0e0e0;
+  }
+  
+  .right-section {
+    width: 60%;
+    padding: 30px;
+    background-color: white;
+    position: relative;
+  }
+  
+  .left-section h2 {
+    text-align: center;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+  
+  .learning-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .learning-form input,
+  .learning-form select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .learning-form input:focus,
+  .learning-form select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+  }
+  
+  .learning-form button {
+    padding: 12px;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .learning-form button:hover {
+    background-color: #2980b9;
+  }
+  
+  .history-button {
+    background-color: #34495e !important;
+  }
+  
+  .right-section .response-content,
+  .right-section .history-content {
+    height: 450px;
+    overflow-y: auto;
+  }
+  
+  .response-box {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .animated-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #555050;
+  }
+  
+  .placeholder-text {
+    text-align: center;
+    color: #000000;
+    padding: 50px;
+  }
+  
+  .history-content h3 {
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+    
+  }
+  
+  .history-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  .history-item {
+    background-color: #f4f6f9;
+    margin-bottom: 15px;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  .history-details {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  
+  .history-details strong {
+    color: rgb(25, 24, 24);
+  }
+  .history-response{
+    color: rgb(99, 97, 97);
+  }
+  
+  /* Custom Scrollbar */
+  .right-section .response-content::-webkit-scrollbar,
+  .history-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .right-section .response-content::-webkit-scrollbar-track,
+  .history-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+  
+  .right-section .response-content::-webkit-scrollbar-thumb,
+  .history-scroll::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+  }
+  .history-item-topic {
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .history-item-topic:hover {
+    background-color: #e0e0e0;
+  }
+  
+  .history-item-detail {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    margin-top: 15px;
+  }
+  
+  .back-button {
+    background: none;
+    border: none;
+    color: var(--primary-color);
+    cursor: pointer;
+    margin-bottom: 15px;
+    padding: 5px;
+    font-size: 14px;
+  }
+  
+  .back-button:hover {
+    text-decoration: underline;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .learning-path-wrapper {
+      flex-direction: column;
+    }
+    
+    .left-section, 
+    .right-section {
+      width: 100%;
+    }
+  }
+  /* Add to learning.css */
+
+/* Loading Container */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  text-align: center;
+  color: var(--text-color);
+}
+
+/* Spinner Animation */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 15px;
+}
+
+/* Keyframes for Spinner */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Adjust text styling for loading message */
+.loading-container p {
+  font-size: 16px;
+  color: var(--text-color);
+}
