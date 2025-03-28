@@ -1,20 +1,19 @@
 /* Navbar.css */
 .navbar {
   display: flex;
-  grid-template-columns: auto 1fr auto auto;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px; /* Increased padding for better spacing */
-  background: rgba(0, 0, 0, 0.6); /* Darker semi-transparent background */
+  padding: 0 20px;
+  background: rgba(0, 0, 0, 0.6);
   position: sticky;
   top: 0;
   z-index: 1000;
-  opacity:90%;
-  backdrop-filter: blur(20px); /* Glass morphism effect */
+  opacity: 90%;
+  backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 15px; /* Rounded edges for navbar */
-  margin: 20px; /* Add margin for rounded edges to be visible */
-  height: 80px; /* Fixed height for navbar */
+  border-radius: 15px;
+  margin: 20px;
+  height: 80px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
@@ -22,21 +21,21 @@
 .navbar .logo {
   display: flex;
   align-items: center;
-  height: 100%; /* Make logo touch top and bottom */
+  height: 100%;
 }
 
 .navbar .logo img {
-  height: 90%; /* Logo fills the navbar height */
+  height: 90%;
   width: auto;
-  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5)); /* Logo shadow */
-  background: linear-gradient(45deg, #00bcd4, #ff00ff); /* Gradient effect for logo */
-  border-radius: 10px; /* Rounded corners for logo */
-  padding: 5px; /* Add padding to make gradient visible */
-  transition: transform 0.3s ease; /* Smooth hover effect */
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+  background: linear-gradient(45deg, #00bcd4, #ff00ff);
+  border-radius: 10px;
+  padding: 5px;
+  transition: transform 0.3s ease;
 }
 
 .navbar .logo img:hover {
-  transform: scale(1.05); /* Slight zoom on hover */
+  transform: scale(1.05);
 }
 
 /* Nav Links */
@@ -44,42 +43,61 @@
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 0px; /* Increased gap for better spacing */
+  gap: 10px;
   margin: 0;
   padding: 0;
 }
 
-.navbar .nav-links a {
+.navbar .nav-links li {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+/* Style for regular links and logout item */
+.navbar .nav-links a, 
+.navbar .nav-links .logout-item {
   color: white;
   text-decoration: none;
-  font-size: 18px; /* Slightly larger font size */
-  padding: 10px 20px; /* Increased padding for better click area */
-  border-radius: 10px; /* Rounded corners for links */
-  transition: all 0.3s ease; /* Smooth transition */
+  font-size: 18px;
+  padding: 10px 20px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
   position: relative;
-  display: inline-block;
-  font-weight: 500; /* Medium font weight */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  cursor: pointer;
 }
 
 /* Hover Effect */
-.navbar .nav-links a:hover {
-  background: rgba(0, 188, 212, 0.5); /* Highlight background on hover */
-  color: white; /* Keep text color white */
-  box-shadow: 0 4px 10px rgba(0, 188, 212, 0.3); /* Glow effect on hover */
+.navbar .nav-links a:hover,
+.navbar .nav-links .logout-item:hover {
+  background: rgba(0, 188, 212, 0.5);
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 188, 212, 0.3);
 }
 
 /* Underline Animation */
-.navbar .nav-links a::after {
+.navbar .nav-links a::after,
+.navbar .nav-links .logout-item::after {
   content: '';
   position: absolute;
   width: 0;
   height: 2px;
-  background: #00bcd4; /* Bright ocean blue accent */
+  background: #00bcd4;
   bottom: 0;
   left: 0;
   transition: width 0.3s ease;
 }
 
-.navbar .nav-links a:hover::after {
-  width: 100%; /* Expand underline on hover */
+.navbar .nav-links a:hover::after,
+.navbar .nav-links .logout-item:hover::after {
+  width: 100%;
+}
+
+/* Icons */
+.nav-icon {
+  font-size: 1.2rem;
 }

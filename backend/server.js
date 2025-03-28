@@ -7,7 +7,8 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const aiRoutes = require('./routes/aiRoutes');
-const careerRoutes = require('./routes/careerRoutes'); // Add this line
+const careerRoutes = require('./routes/careerRoutes');
+const QuizRoutes = require('./routes/QuizRoutes'); // Corrected import (lowercase 'quizRoutes')
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
 dotenv.config();
@@ -49,7 +50,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use("/api/ai", aiRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
-app.use('/api/career', careerRoutes); // Add this line
+app.use('/api', QuizRoutes); // Mounted correctly
+app.use('/api/career', careerRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

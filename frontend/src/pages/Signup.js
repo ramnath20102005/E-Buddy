@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "../Auth.css"; // Common CSS for both Signup & Login
 
-const Signup = () => {
+const Signup = ({ setIsAuthenticated }) => {  // Add setIsAuthenticated prop
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,24 +13,29 @@ const Signup = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     setError(null);
-
+    
     try {
       const { data } = await axios.post("http://localhost:5000/api/auth/signup", {
         name,
         email,
         password,
       });
-
-      // ✅ Store token in localStorage
-      localStorage.setItem("token", data.token);
-
-      // ✅ Store userId in sessionStorage for tracking progress
-      sessionStorage.setItem("userId", data.userId);
-
-      // Redirect to Profile Setup page after successful signup
-      navigate("/profile-setup");
+      
+      if (data.token && data.userId) {
+        localStorage.setItem("token", data.token);
+        sessionStorage.setItem("userId", data.userId);
+        setIsAuthenticated(true);  // Update authentication state
+        navigate("/profile-setup", { replace: true });
+      } else {
+        throw new Error("Missing token or userId in response");
+      }
     } catch (err) {
-      setError(err.response?.data?.message || "Signup failed");
+      console.error("Signup error:", err);
+      setError(
+        err.response?.data?.message ||
+        err.message ||
+        "Signup failed. Please try again."
+      );
     }
   };
 
@@ -72,7 +77,7 @@ const Signup = () => {
               Sign Up
             </button>
           </form>
-          <p>
+          <p className="auth-link">
             <a href="/login">Already have an account? Login</a>
           </p>
         </div>

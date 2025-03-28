@@ -11,12 +11,16 @@ import LearningPath from "./pages/LearningPath";
 import StudyMaterials from "./pages/StudyMaterials";
 import CareerPath from "./pages/CareerPath";
 import Landing from './pages/Landing';
+import QuizPage from './pages/QuizPage';
 
 import './App.css';
 
 const App = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const token = localStorage.getItem('token');
+    return !!token;
+  });
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -42,28 +46,45 @@ const App = () => {
       <div className="app-container">
         <Navbar isAuthenticated={isAuthenticated} logout={logout} />
         <Routes>
-          {/* Default Route */}
           <Route
             path="/"
             element={<Navigate to={isAuthenticated ? "/home" : "/landing"} />}
           />
 
-          {/* Landing Page */}
           <Route
             path="/landing"
             element={isAuthenticated ? <Navigate to="/home" /> : <Landing />}
           />
 
-          {/* Main Home Page (Protected) */}
           <Route
             path="/home"
             element={
               isAuthenticated ? (
                 <>
-                  <div className="hero-section">
+                  <div className="hero-section" style={{
+                    padding: '5rem 2rem',
+                    textAlign: 'center',
+                    background: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${process.env.PUBLIC_URL}/hero-bg.jpg) center/cover no-repeat`,
+                    color: 'white',
+                    minHeight: '60vh',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center'
+                  }}>
                     <div className="hero-content">
-                      <h1>Welcome to E-Buddy</h1>
-                      <p>Your ultimate companion for learning and career growth.</p>
+                      <h1 style={{
+                        fontSize: '3.5rem',
+                        marginBottom: '1.5rem',
+                        fontWeight: '700',
+                        textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
+                      }}>Welcome to E-Buddy</h1>
+                      <p style={{
+                        fontSize: '1.5rem',
+                        maxWidth: '800px',
+                        margin: '0 auto 2rem',
+                        textShadow: '1px 1px 2px rgba(0, 0, 0, 0.5)'
+                      }}>Your ultimate companion for learning and career growth.</p>
                     </div>
                   </div>
                   <div className="carousel-section">
@@ -73,13 +94,13 @@ const App = () => {
                         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
                       >
                         <div className="carousel-item">
-                          <img src="/carousel_images/car_image1.jpg" alt="Slide 1" />
+                          <img src={`${process.env.PUBLIC_URL}/carousel_images/car_image1.jpg`} alt="Slide 1" />
                         </div>
                         <div className="carousel-item">
-                          <img src="/carousel_images/car_image2.jpg" alt="Slide 2" />
+                          <img src={`${process.env.PUBLIC_URL}/carousel_images/car_image2.jpg`} alt="Slide 2" />
                         </div>
                         <div className="carousel-item">
-                          <img src="/carousel_images/car_image3.jpg" alt="Slide 3" />
+                          <img src={`${process.env.PUBLIC_URL}/carousel_images/car_image3.jpg`} alt="Slide 3" />
                         </div>
                       </div>
                       <button className="carousel-control prev" onClick={prevSlide}>
@@ -108,11 +129,12 @@ const App = () => {
             }
           />
 
-          {/* Authentication Pages */}
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-          <Route path="/signup" element={<Signup />} />
+          <Route 
+            path="/signup" 
+            element={<Signup setIsAuthenticated={setIsAuthenticated} />} 
+          />
 
-          {/* Protected Pages */}
           <Route
             path="/profile-setup"
             element={isAuthenticated ? <ProfileSetup /> : <Navigate to="/landing" />}
@@ -132,6 +154,10 @@ const App = () => {
           <Route
             path="/careerpath"
             element={isAuthenticated ? <CareerPath /> : <Navigate to="/landing" />}
+          />
+          <Route
+            path="/quiz"
+            element={isAuthenticated ? <QuizPage /> : <Navigate to="/landing" />}
           />
         </Routes>
         <Footer />
