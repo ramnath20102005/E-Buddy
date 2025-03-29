@@ -62,13 +62,12 @@ const Profile = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Validate image type and size
     if (!file.type.match('image.*')) {
       setError('Please select an image file (JPEG, PNG)');
       return;
     }
     
-    if (file.size > 2 * 1024 * 1024) { // 2MB limit
+    if (file.size > 2 * 1024 * 1024) {
       setError('Image size should be less than 2MB');
       return;
     }
@@ -120,7 +119,7 @@ const Profile = () => {
 
       setSuccess('Profile updated successfully!');
       setIsEditing(false);
-      fetchProfile(); // Refresh the profile data
+      fetchProfile();
     } catch (err) {
       if (err.response?.status === 401) {
         localStorage.removeItem('token');
@@ -137,6 +136,14 @@ const Profile = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     navigate('/login');
+  };
+
+  const navigateToLearningActivity = () => {
+    navigate('/learning-activity');
+  };
+
+  const navigateToCareerInsights = () => {
+    navigate('/career-insights');
   };
 
   const cleanArrayDisplay = (arr) => {
@@ -218,22 +225,32 @@ const Profile = () => {
                     </Card>
                   </Col>
                   <Col md={4}>
-                    <Card className="stat-card">
+                    <Card 
+                      className="stat-card hover-shadow" 
+                      onClick={navigateToLearningActivity}
+                      style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
+                    >
                       <Card.Body>
                         <Card.Title>Learning Activity</Card.Title>
                         <Card.Text className="stat-description">
                           Track your learning activities and see your course engagement.
                         </Card.Text>
+                        <div className="text-end text-primary">View History →</div>
                       </Card.Body>
                     </Card>
                   </Col>
                   <Col md={4}>
-                    <Card className="stat-card">
+                    <Card 
+                      className="stat-card hover-shadow" 
+                      onClick={navigateToCareerInsights}
+                      style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
+                    >
                       <Card.Body>
                         <Card.Title>Recent Career Insights</Card.Title>
                         <Card.Text className="stat-description">
                           Get personalized career suggestions and skill-building insights.
                         </Card.Text>
+                        <div className="text-end text-primary">View History →</div>
                       </Card.Body>
                     </Card>
                   </Col>
@@ -322,12 +339,12 @@ const Profile = () => {
                         />
                       </Form.Group>
                       
-                      <Form.Group controlId="certifications" className="mb-4">
+                      <Form.Group controlId="achievements" className="mb-4">
                         <Form.Label className="form-label">Achievements (comma separated)</Form.Label>
                         <Form.Control
                           type="text"
-                          value={Array.isArray(certifications) ? certifications.join(', ') : certifications}
-                          onChange={(e) => setCertifications(e.target.value.split(',').map(cert => cert.trim()))}
+                          value={Array.isArray(achievements) ? achievements.join(', ') : achievements}
+                          onChange={(e) => setAchievements(e.target.value.split(',').map(cert => cert.trim()))}
                           className="form-input"
                           placeholder="e.g. AWS Certified, Google Analytics"
                           disabled={isLoading}
@@ -348,7 +365,7 @@ const Profile = () => {
                   <p className="bio-text">{cleanArrayDisplay(interests)}</p>
                   
                   <h4 className="section-title">Achievements</h4>
-                  <p className="bio-text">{cleanArrayDisplay(certifications)}</p>
+                  <p className="bio-text">{cleanArrayDisplay(achievements)}</p>
                 </div>
               )}
             </Col>

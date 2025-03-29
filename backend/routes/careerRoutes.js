@@ -31,7 +31,7 @@ router.post("/generate", async (req, res) => {
       Skills - ${skills},
       Interests - ${interests},
       Achievements - ${achievements}.
-      Provide a detailed career path with milestones.`;
+      Provide a detailed career path with future Trends.`;
 
     const response = await axios.post(
       `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent?key=${GEMINI_API_KEY}`,
@@ -40,6 +40,10 @@ router.post("/generate", async (req, res) => {
     );
 
     const responseText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+    
+    // Add personalized greeting
+    const userName = user.name || 'there';
+    const personalizedResponse = `Hi ${userName}! Here's your personalized career path:\n\n${responseText}`;
 
     const historyEntry = new CareerPathHistory({
       userId: req.user._id,
@@ -47,11 +51,11 @@ router.post("/generate", async (req, res) => {
       interests: user.interests,
       achievements: user.achievements,
       requestText: prompt,
-      responseText,
+      responseText: personalizedResponse, // Store personalized response
     });
 
     await historyEntry.save();
-    res.json({ response: responseText });
+    res.json({ response: personalizedResponse });
   } catch (error) {
     console.error("🔴 Career Path Error:", error);
     res.status(500).json({ error: "Failed to generate career path." });

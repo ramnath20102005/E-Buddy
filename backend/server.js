@@ -47,6 +47,7 @@ app.use((req, res, next) => {
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+
 app.use("/api/ai", aiRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);

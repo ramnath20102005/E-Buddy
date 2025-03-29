@@ -29,7 +29,6 @@ async function callGeminiAPI(prompt) {
 
 // Apply authentication to all AI routes
 router.use(protect);
-
 router.post("/learning-path", async (req, res) => {
   try {
     const { topic, level, duration } = req.body;
@@ -37,8 +36,14 @@ router.post("/learning-path", async (req, res) => {
       return res.status(400).json({ error: "Topic, level, and duration are required." });
     }
 
+    // Get user's name
+    const user = await User.findById(req.user._id);
+    const userName = user?.name || 'there';
+
     const prompt = `Give a detailed learning path for ${topic} at a ${level} level for a duration of ${duration} give in structured paragraph(for example if the duration is one hour split it into minute wise) and alsogive the para as topic and content where..topic is time period and topic and content what to do in that topic.Dont use special characters on response for specifying topics and contents`;
+    
     const responseText = await callGeminiAPI(prompt);
+    const personalizedResponse = `Hi ${userName}! Here's your learning path:\n\n${responseText}`;
 
     const historyEntry = new LearningPathHistory({
       userId: req.user._id,
@@ -46,11 +51,11 @@ router.post("/learning-path", async (req, res) => {
       level,
       duration,
       requestText: prompt,
-      responseText,
+      responseText: personalizedResponse, // Store personalized response
     });
 
     await historyEntry.save();
-    res.json({ response: responseText });
+    res.json({ response: personalizedResponse });
   } catch (error) {
     console.error("🔴 Error:", error);
     res.status(500).json({ error: "Failed to generate learning path." });
@@ -115,10 +120,18 @@ router.post("/chatbot", async (req, res) => {
       return res.status(400).json({ error: "Message is required." });
     }
 
-    console.log("💬 Chatbot Message Request:", message);
-    const responseText = await callGeminiAPI(message);
+    const user = await User.findById(req.user._id);
+    const userName = user?.name || 'there';
     
-    res.json({ response: responseText });
+    let aiResponse = await callGeminiAPI(message);
+    
+    // Check if response already contains a greeting
+    const hasGreeting = /^(hi|hello|hey|greetings)[,!]?/i.test(aiResponse);
+    const response = hasGreeting 
+      ? aiResponse.replace(/^(hi|hello|hey|greetings)[,!]?\s*/i, `$& ${userName}, `)
+      : `Hi ${userName}! ${aiResponse}`;
+    
+    res.json({ response });
   } catch (error) {
     console.error("🔴 Chatbot Error:", error);
     res.status(500).json({ error: "Failed to generate chatbot response." });

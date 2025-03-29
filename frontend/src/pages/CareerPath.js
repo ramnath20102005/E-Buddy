@@ -19,7 +19,7 @@ const CareerPath = () => {
                .replace(/- /g, '• ');
   };
 
-  // Typing effect for response
+  // Typing effect for response - Fixed version
   useEffect(() => {
     if (response) {
       setAnimatedResponse("");
@@ -31,6 +31,7 @@ const CareerPath = () => {
           i++;
         } else {
           clearInterval(typingEffect);
+          setAnimatedResponse(formattedResponse); // This line ensures full text is preserved
         }
       }, 10);
 
@@ -38,6 +39,7 @@ const CareerPath = () => {
     }
   }, [response]);
 
+  // All other functions remain exactly the same
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -123,7 +125,12 @@ const CareerPath = () => {
         <div className="right-section">
           {activeSection === 'generate' && (
             <div className="response-content">
-              {response ? (
+              {isLoading ? (
+                <div className="loading-container">
+                  <div className="spinner"></div>
+                  <p>Generating your career path...</p>
+                </div>
+              ) : response ? (
                 <div className="response-box">
                   <h3>Generated Career Path:</h3>
                   <pre className="animated-text">{animatedResponse}</pre>

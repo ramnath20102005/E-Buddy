@@ -190,7 +190,12 @@ const StudyMaterials = () => {
 
         <div className="right-section">
           <div className="response-content">
-            {response ? (
+            {isLoading ? (
+              <div className="loading-container">
+                <div className="spinner"></div>
+                <p>Generating your study material...</p>
+              </div>
+            ) : response ? (
               <div className="response-box">
                 <h3>
                   Generated {materialType === 'quiz' ? 'Quiz' : 
