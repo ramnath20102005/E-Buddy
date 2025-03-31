@@ -1,4 +1,4 @@
-/* Chatbot.css */
+/* Chatbot.css - Enhanced with advanced animations and glow effects */
 .chatbot-container {
   position: fixed;
   bottom: 30px;
@@ -16,19 +16,81 @@
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 20px rgba(74, 107, 255, 0.4), 0 0 20px rgba(74, 107, 255, 0.2);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Glow effect on hover */
 .chatbot-icon:hover {
   transform: scale(1.1);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 6px 25px rgba(74, 107, 255, 0.6), 0 0 30px rgba(74, 107, 255, 0.3);
+}
+
+/* Active state with subtle rotation */
+.chatbot-icon.active {
+  transform: scale(1.1) rotate(5deg);
+  background: linear-gradient(135deg, #3a5bef 0%, #2a4bdf 100%);
+}
+
+/* Enhanced pulsing animation with glow */
+.chatbot-icon.pulse::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(74, 107, 255, 0.6) 0%, rgba(58, 91, 239, 0.4) 100%);
+  z-index: -1;
+  animation: enhancedPulse 2s infinite ease-out;
+}
+
+@keyframes enhancedPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+    box-shadow: 0 0 10px rgba(74, 107, 255, 0.5);
+  }
+  70% {
+    transform: scale(1.4);
+    opacity: 0;
+    box-shadow: 0 0 20px rgba(74, 107, 255, 0.3);
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
 }
 
 .chatbot-icon img {
   width: 70%;
   height: 70%;
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.chatbot-icon:hover img {
+  transform: scale(1.15);
+}
+
+/* Fallback icon with animation */
+.chatbot-icon::before {
+  content: "";
+  position: absolute;
+  width: 60%;
+  height: 60%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-14h2v7h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.chatbot-icon img[src=""] + .chatbot-icon::before,
+.chatbot-icon img:not([src]) + .chatbot-icon::before,
+.chatbot-icon img:error + .chatbot-icon::before {
+  opacity: 1;
 }
 
 .chatbot-window {
@@ -36,18 +98,29 @@
   height: 500px;
   background: white;
   border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15), 0 0 20px rgba(74, 107, 255, 0.1);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transform: translateY(20px);
+  position: absolute;
+  bottom: 75px;
+  right: 0;
+  transform: scale(0.9);
   opacity: 0;
-  animation: fadeInUp 0.3s ease forwards;
+  animation: windowPopIn 0.4s ease-out forwards;
 }
 
-@keyframes fadeInUp {
-  to {
-    transform: translateY(0);
+@keyframes windowPopIn {
+  0% {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
     opacity: 1;
   }
 }
@@ -59,26 +132,121 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Header glow effect */
+.chatbot-header::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+  animation: headerShine 5s infinite linear;
+}
+
+@keyframes headerShine {
+  0% { transform: translateX(-100%) translateY(-100%); }
+  100% { transform: translateX(100%) translateY(100%); }
 }
 
 .chatbot-header h3 {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 600;
+  position: relative;
+  z-index: 1;
 }
 
-.chatbot-header button {
+.chatbot-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.voice-toggle {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.voice-toggle.active {
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.voice-toggle:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+/* SVG styles with animation */
+.voice-toggle svg,
+.mic-button svg,
+.send-button svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+  transition: transform 0.3s ease;
+}
+
+.voice-toggle:hover svg {
+  transform: scale(1.2);
+}
+
+.close-btn {
   background: none;
   border: none;
   color: white;
   font-size: 1.5rem;
   cursor: pointer;
   padding: 0 5px;
-  transition: transform 0.2s;
+  transition: all 0.3s ease;
 }
 
-.chatbot-header button:hover {
-  transform: scale(1.2);
+.close-btn:hover {
+  transform: scale(1.2) rotate(90deg);
+  color: #ffd700;
+}
+
+.chatbot-options {
+  padding: 10px 15px;
+  background: #f8f9fb;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.voice-selector {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  background: white;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.voice-selector:focus {
+  border-color: #4a6bff;
+  box-shadow: 0 0 8px rgba(74, 107, 255, 0.3);
 }
 
 .chatbot-body {
@@ -89,9 +257,10 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  position: relative;
 }
 
-/* Custom scrollbar for chat body */
+/* Enhanced scrollbar */
 .chatbot-body::-webkit-scrollbar {
   width: 6px;
 }
@@ -102,12 +271,13 @@
 }
 
 .chatbot-body::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #4a6bff;
   border-radius: 3px;
+  box-shadow: 0 0 5px rgba(74, 107, 255, 0.5);
 }
 
 .chatbot-body::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
+  background: #3a5bef;
 }
 
 .bot-message, .user-message {
@@ -117,17 +287,21 @@
   line-height: 1.4;
   position: relative;
   word-wrap: break-word;
-  animation: messageIn 0.2s ease-out;
+  animation: messagePop 0.4s ease-out;
+  transition: all 0.2s ease;
 }
 
-@keyframes messageIn {
-  from {
+@keyframes messagePop {
+  0% {
     opacity: 0;
-    transform: translateY(5px);
+    transform: scale(0.9) translateY(10px);
   }
-  to {
+  70% {
+    transform: scale(1.02);
+  }
+  100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1) translateY(0);
   }
 }
 
@@ -136,7 +310,37 @@
   color: #333;
   border-top-left-radius: 5px;
   align-self: flex-start;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05), 0 0 10px rgba(74, 107, 255, 0.1);
+}
+
+/* Enhanced sound wave animation */
+.bot-message::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  bottom: -10px;
+  width: 16px;
+  height: 16px;
+  background: radial-gradient(circle, rgba(74, 107, 255, 0.8) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0;
+  animation: soundWaveEnhanced 1.5s ease-out;
+}
+
+@keyframes soundWaveEnhanced {
+  0% {
+    opacity: 0.8;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(2.5);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3);
+  }
 }
 
 .user-message {
@@ -144,6 +348,12 @@
   color: white;
   border-top-right-radius: 5px;
   align-self: flex-end;
+  box-shadow: 0 2px 5px rgba(74, 107, 255, 0.2);
+}
+
+.user-message:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(74, 107, 255, 0.3);
 }
 
 .chatbot-footer {
@@ -151,6 +361,7 @@
   padding: 15px;
   background: white;
   border-top: 1px solid #eaeaea;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .chatbot-footer input {
@@ -160,35 +371,75 @@
   border-radius: 25px;
   outline: none;
   font-size: 0.9rem;
-  transition: border 0.3s;
+  transition: all 0.3s ease;
 }
 
 .chatbot-footer input:focus {
   border-color: #4a6bff;
+  box-shadow: 0 0 8px rgba(74, 107, 255, 0.3);
 }
 
-.chatbot-footer button {
+.mic-button, .send-button {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.mic-button {
+  background: #f1f3f8;
+  color: #4a6bff;
+  border: 1px solid #ddd;
+}
+
+.mic-button.listening {
+  background: #ff4a6b;
+  color: white;
+  border-color: #ff4a6b;
+  box-shadow: 0 0 15px rgba(255, 74, 107, 0.5);
+  animation: recordingGlow 1.5s infinite ease-in-out;
+}
+
+@keyframes recordingGlow {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 10px rgba(255, 74, 107, 0.5);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 20px rgba(255, 74, 107, 0.7);
+  }
+}
+
+.mic-button:hover {
+  background: #e1e3e8;
+  transform: scale(1.1);
+}
+
+.send-button {
   background: #4a6bff;
   color: white;
   border: none;
-  border-radius: 25px;
-  padding: 0 20px;
-  margin-left: 10px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.3s;
+  box-shadow: 0 2px 5px rgba(74, 107, 255, 0.3);
 }
 
-.chatbot-footer button:hover {
+.send-button:hover {
   background: #3a5bef;
-  transform: translateY(-1px);
+  transform: scale(1.1) translateY(-2px);
+  box-shadow: 0 4px 10px rgba(74, 107, 255, 0.5);
 }
 
-.chatbot-footer button:active {
-  transform: translateY(0);
+.send-button:active {
+  transform: scale(0.95);
 }
 
-/* Typing indicator (optional) */
+/* Enhanced typing indicator */
 .typing-indicator {
   display: flex;
   padding: 10px 15px;
@@ -198,11 +449,12 @@
 .typing-indicator span {
   height: 8px;
   width: 8px;
-  background: #ccc;
+  background: #4a6bff;
   border-radius: 50%;
   display: inline-block;
   margin: 0 2px;
-  animation: typing 1s infinite ease-in-out;
+  animation: typingGlow 1s infinite ease-in-out;
+  box-shadow: 0 0 5px rgba(74, 107, 255, 0.5);
 }
 
 .typing-indicator span:nth-child(2) {
@@ -213,12 +465,14 @@
   animation-delay: 0.4s;
 }
 
-@keyframes typing {
+@keyframes typingGlow {
   0%, 100% {
     transform: translateY(0);
+    box-shadow: 0 0 5px rgba(74, 107, 255, 0.5);
   }
   50% {
     transform: translateY(-5px);
+    box-shadow: 0 0 10px rgba(74, 107, 255, 0.8);
   }
 }
 
