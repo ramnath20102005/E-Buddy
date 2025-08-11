@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
-import { FaUser, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaBook, FaChartLine, FaGraduationCap, FaQuestionCircle } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaBook, FaChartLine, FaGraduationCap, FaQuestionCircle, FaUniversity } from 'react-icons/fa';
 
 const Navbar = ({ isAuthenticated, logout }) => {
   const navigate = useNavigate();
@@ -73,6 +73,16 @@ const Navbar = ({ isAuthenticated, logout }) => {
                 >
                   <FaChartLine className="nav-icon" />
                   <span>Career Guidance</span>
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/course-recommendation" 
+                  className={activeLink === 'course-recommendation' ? 'active' : ''}
+                  onClick={() => handleLinkClick('course-recommendation')}
+                >
+                  <FaUniversity className="nav-icon" />
+                  <span>Course Recommendations</span>
                 </Link>
               </li>
               <li>

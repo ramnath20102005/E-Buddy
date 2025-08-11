@@ -1,20 +1,27 @@
-const asyncHandler = require('express-async-handler');
-const User = require('../models/User');
+const asyncHandler = require("express-async-handler");
+const User = require("../models/User");
 
 // @desc    Get user profile
 // @route   GET /api/profile
 // @access  Private
 const getProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select('-password');
+  const user = await User.findById(req.user._id);
   
-  if (!user) {
+  if (user) {
+    res.json({
+      _id: user._id,
+      userId: user.userId,
+      name: user.name,
+      email: user.email,
+      skills: user.skills,
+      interests: user.interests,
+      achievements: user.achievements,
+      profileCompleted: user.profileCompleted
+    });
+  } else {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
-
-  // Remove default image assignment - let frontend handle it
-  // Just return the user data as-is
-  res.json(user);
 });
 
 // @desc    Update user profile
@@ -23,43 +30,29 @@ const getProfile = asyncHandler(async (req, res) => {
 const updateProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
 
-  if (!user) {
+  if (user) {
+    user.name = req.body.name || user.name;
+    user.skills = req.body.skills || user.skills;
+    user.interests = req.body.interests || user.interests;
+    user.achievements = req.body.achievements || user.achievements;
+    user.profileCompleted = true;
+
+    const updatedUser = await user.save();
+
+    res.json({
+      _id: updatedUser._id,
+      userId: updatedUser.userId,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      skills: updatedUser.skills,
+      interests: updatedUser.interests,
+      achievements: updatedUser.achievements,
+      profileCompleted: updatedUser.profileCompleted
+    });
+  } else {
     res.status(404);
-    throw new Error('User not found');
+    throw new Error("User not found");
   }
-
-  // Update fields
-  const { name, bio, skills, interests, achievements, profileImage } = req.body;
-
-  if (name) user.name = name;
-  if (bio) user.bio = bio;
-
-  // Handle array fields
-  if (skills) {
-    user.skills = Array.isArray(skills) ? skills : 
-                  typeof skills === 'string' ? skills.split(',').map(s => s.trim()) : 
-                  [];
-  }
-  
-  if (interests) {
-    user.interests = Array.isArray(interests) ? interests : 
-                    typeof interests === 'string' ? interests.split(',').map(i => i.trim()) : 
-                    [];
-  }
-  
-  if (achievements) {
-    user.achievements = Array.isArray(achievements) ? achievements : 
-                       typeof achievements === 'string' ? achievements.split(',').map(a => a.trim()) : 
-                       [];
-  }
-
-  // Handle profile image (accepts Base64 or null)
-  if (profileImage !== undefined) {
-    user.profileImage = profileImage || null; // Explicitly set to null if empty
-  }
-
-  const updatedUser = await user.save();
-  res.json(updatedUser);
 });
 
 module.exports = { getProfile, updateProfile };

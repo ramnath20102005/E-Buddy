@@ -1,34 +1,33 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const CareerPathHistorySchema = new mongoose.Schema(
-  {
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    skills: {
-      type: [String],
-      default: [],
-    },
-    interests: {
-      type: [String],
-      default: [],
-    },
-    achievements: {
-      type: [String],
-      default: [],
-    },
-    requestText: {
-      type: String,
-      required: true,
-    },
-    responseText: {
-      type: String,
-      required: true,
-    },
+const careerPathHistorySchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
   },
-  { timestamps: true }
-);
+  skills: [{
+    type: String
+  }],
+  interests: [{
+    type: String
+  }],
+  achievements: [{
+    type: String
+  }],
+  requestText: {
+    type: String,
+    required: true
+  },
+  responseText: {
+    type: String,
+    required: true
+  }
+}, {
+  timestamps: true
+});
 
-module.exports = mongoose.model("CareerPathHistory", CareerPathHistorySchema);
+// Index for faster queries
+careerPathHistorySchema.index({ userId: 1, createdAt: -1 });
+
+module.exports = mongoose.model('CareerPathHistory', careerPathHistorySchema);

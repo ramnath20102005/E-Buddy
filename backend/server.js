@@ -4,15 +4,22 @@ const path = require('path');
 const morgan = require('morgan');
 const cors = require('cors');
 const connectDB = require('./config/db');
+const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+
+// Load environment variables first
+dotenv.config();
+
+// Environment variables loaded successfully
+
+connectDB();
+
+// Import routes after environment variables are loaded
 const authRoutes = require('./routes/authRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const aiRoutes = require('./routes/aiRoutes');
 const careerRoutes = require('./routes/careerRoutes');
-const QuizRoutes = require('./routes/QuizRoutes'); // Corrected import (lowercase 'quizRoutes')
-const { notFound, errorHandler } = require('./middleware/errorMiddleware');
-
-dotenv.config();
-connectDB();
+const QuizRoutes = require('./routes/QuizRoutes');
+const courseRecommendationRoutes = require('./routes/courseRecommendationRoutes');
 
 const app = express();
 
@@ -53,6 +60,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api', QuizRoutes); // Mounted correctly
 app.use('/api/career', careerRoutes);
+app.use('/api/course-recommendation', courseRecommendationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

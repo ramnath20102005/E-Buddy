@@ -15,6 +15,7 @@ import Landing from './pages/Landing';
 import QuizPage from './pages/QuizPage';
 import LearningActivity from './pages/LearningActivity';
 import CareerInsights from './pages/CareerInsights';
+import CourseRecommendation from './pages/CourseRecommendation';
 import './App.css';
 
 const App = () => {
@@ -279,6 +280,7 @@ const App = () => {
           <Route path="/quiz" element={isAuthenticated ? <QuizPage /> : <Navigate to="/landing" />} />
           <Route path="/learning-activity" element={isAuthenticated ? <LearningActivity /> : <Navigate to="/landing" />} />
           <Route path="/career-insights" element={isAuthenticated ? <CareerInsights /> : <Navigate to="/landing" />} />
+          <Route path="/course-recommendation" element={isAuthenticated ? <CourseRecommendation /> : <Navigate to="/landing" />} />
         </Routes>
         <Footer />
       </div>
