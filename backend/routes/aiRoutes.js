@@ -1,31 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const axios = require("axios");
 const dotenv = require("dotenv");
 const { protect } = require('../middleware/authMiddleware');
 const LearningPathHistory = require("../models/LearningPathHistory");
 const User = require("../models/User");
+const { generateTextFromPrompt } = require("../utils/nimClient");
 
 dotenv.config();
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-if (!GEMINI_API_KEY) {
-  console.error("❌ Error: Missing GEMINI_API_KEY in environment variables.");
-}
-
-async function callGeminiAPI(prompt) {
-  try {
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent?key=${GEMINI_API_KEY}`,
-      { contents: [{ parts: [{ text: prompt }] }] },
-      { headers: { "Content-Type": "application/json" } }
-    );
-    return response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
-  } catch (error) {
-    console.error("🔴 Gemini API Error:", error.response?.data || error.message);
-    throw error;
-  }
-}
+// NVIDIA NIM is used for all AI endpoints
 
 // Apply authentication to all AI routes
 router.use(protect);
@@ -40,9 +22,9 @@ router.post("/learning-path", async (req, res) => {
     const user = await User.findById(req.user._id);
     const userName = user?.name || 'there';
 
-    const prompt = `Give a detailed learning path for ${topic} at a ${level} level for a duration of ${duration} give in structured paragraph(for example if the duration is one hour split it into minute wise) and alsogive the para as topic and content where..topic is time period and topic and content what to do in that topic.Dont use special characters on response for specifying topics and contents`;
-    
-    const responseText = await callGeminiAPI(prompt);
+    const prompt = `Give a detailed learning path for ${topic} at a ${level} level for a duration of ${duration}. Provide structured paragraphs (e.g., if duration is one hour, split into minute-wise segments). Return plain text without special characters for headings. Use the format: topic (time period and title) followed by content (what to do in that topic).`;
+
+    const responseText = await generateTextFromPrompt(prompt);
     const personalizedResponse = `Hi ${userName}! Here's your learning path:\n\n${responseText}`;
 
     const historyEntry = new LearningPathHistory({
@@ -70,7 +52,7 @@ router.post("/summarize", async (req, res) => {
     }
 
     const prompt = `Provide ${bullets || 5} concise bullet points summarizing ${topic}.`;
-    const response = await callGeminiAPI(prompt);
+    const response = await generateTextFromPrompt(prompt);
     
     res.json({ summary: response });
   } catch (error) {
@@ -87,7 +69,7 @@ router.post("/flashcards", async (req, res) => {
     }
 
     const prompt = `Create ${count || 5} flashcards about ${topic}. Format as: Q: question\nA: answer\n\n`;
-    const response = await callGeminiAPI(prompt);
+    const response = await generateTextFromPrompt(prompt);
     
     res.json({ flashcards: response });
   } catch (error) {
@@ -104,7 +86,7 @@ router.post("/quiz", async (req, res) => {
     }
 
     const prompt = `Generate ${questions || 5} multiple-choice questions about ${topic}. Format each as: Q: [question]\nA) [option1]\nB) [option2]\nC) [option3]\nD) [option4]\nAnswer: [correct letter]\n\n`;
-    const response = await callGeminiAPI(prompt);
+    const response = await generateTextFromPrompt(prompt);
     
     res.json({ quiz: response });
   } catch (error) {
@@ -123,7 +105,7 @@ router.post("/chatbot", async (req, res) => {
     const user = await User.findById(req.user._id);
     const userName = user?.name || 'there';
     
-    let aiResponse = await callGeminiAPI(message);
+    let aiResponse = await generateTextFromPrompt(message);
     
     // Check if response already contains a greeting
     const hasGreeting = /^(hi|hello|hey|greetings)[,!]?/i.test(aiResponse);

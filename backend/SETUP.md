@@ -7,7 +7,7 @@ Create a `.env` file in the backend directory with the following variables:
 ```env
 MONGO_URI=mongodb://localhost:27017/ebuddy
 JWT_SECRET=your_jwt_secret_key_here
-GEMINI_API_KEY=your_gemini_api_key_here
+NVIDIA_API_KEY=your_nvidia_nim_api_key_here
 NODE_ENV=development
 PORT=5000
 ```
@@ -22,8 +22,8 @@ PORT=5000
    - Generate a strong random string
    - Example: `mySuperSecretKey123!@#`
 
-3. **GEMINI_API_KEY**: Google Gemini API key
-   - Get from: https://makersuite.google.com/app/apikey
+3. **NVIDIA_API_KEY**: NVIDIA NIM API key
+   - Get from: https://build.nvidia.com/nim (NVIDIA API key dashboard)
    - Required for AI-powered features
 
 4. **NODE_ENV**: Environment mode

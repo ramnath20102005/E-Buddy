@@ -1,17 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const axios = require("axios");
 const dotenv = require("dotenv");
 const { protect } = require('../middleware/authMiddleware');
 const CourseRecommendationHistory = require("../models/CourseRecommendationHistory");
 const User = require("../models/User");
+const { generateTextFromPrompt } = require("../utils/nimClient");
 
 dotenv.config();
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-if (!GEMINI_API_KEY) {
-  console.error("❌ Error: Missing GEMINI_API_KEY in environment variables.");
-}
+// NVIDIA NIM is used for all AI endpoints
 
 // Apply authentication to all course recommendation routes
 router.use(protect);
@@ -40,7 +36,7 @@ router.post("/generate", async (req, res) => {
       return res.status(400).json({ error: "Name, age, region, interests, and marks are required." });
     }
 
-    // Create a comprehensive prompt for Gemini API
+    // Create a comprehensive prompt for NVIDIA NIM
     const prompt = `As an expert educational counselor, provide detailed course and college recommendations for a 12th pass student with the following profile:
 
 Student Profile:
@@ -83,20 +79,7 @@ Please provide:
 
 Format the response in a clear, structured manner with proper headings and bullet points. Make it easy to read and actionable for the student.`;
 
-    // Call Gemini API
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent?key=${GEMINI_API_KEY}`,
-      { 
-        contents: [{ 
-          parts: [{ text: prompt }] 
-        }] 
-      },
-      { 
-        headers: { "Content-Type": "application/json" } 
-      }
-    );
-
-    const responseText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+    const responseText = await generateTextFromPrompt(prompt);
     
     // Add personalized greeting
     const personalizedResponse = `Dear ${name},\n\n${responseText}`;
@@ -128,7 +111,7 @@ Format the response in a clear, structured manner with proper headings and bulle
     console.error("🔴 Course Recommendation Error:", error);
     
     if (error.response?.status === 400) {
-      return res.status(400).json({ error: "Invalid request to Gemini API. Please check your inputs." });
+      return res.status(400).json({ error: "Invalid request to NVIDIA NIM API. Please check your inputs." });
     }
     
     if (error.response?.status === 403) {

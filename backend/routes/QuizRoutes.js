@@ -2,7 +2,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const express = require('express');
 const router = express.Router();
-const axios = require('axios');
+const { chatCompletion } = require('../utils/nimClient');
 const User = require('../models/User');
 const { protect } = require('../middleware/authMiddleware');
 
@@ -16,7 +16,7 @@ const generateQuizSeed = (topic, numberOfQuestions) => {
   return `${topic.toLowerCase().replace(/\s+/g, '_')}_${numberOfQuestions}_${timestamp}_${Math.random().toString(36).substring(7)}`;
 };
 
-// Helper function to validate and parse Gemini response
+// Helper function to validate and parse model response
 const parseQuizResponse = (responseText, requestedQuestions) => {
   try {
     // Remove any markdown or code block markers
@@ -75,41 +75,29 @@ router.post('/quiz', protect, async (req, res) => {
 
     const quizSeed = generateQuizSeed(topic, parsedNumberOfQuestions);
 
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent?key=${process.env.GEMINI_API_KEY}`,
-      {
-        contents: [{
-          parts: [{
-            text: `Generate a unique and challenging multiple-choice quiz about ${topic}. 
-                   Ensure the following requirements:
-                   - Generate exactly ${parsedNumberOfQuestions} questions
-                   - Each question should test a unique concept or knowledge area
-                   - Avoid trivial or overly simple questions
-                   - Provide 4 plausible but distinct answer options
-                   - Clearly mark the correct answer
-                   Use this randomization seed: ${quizSeed}
-                   
-                   Format strictly as JSON:
-                   {
-                     "questions": [
-                       {
-                         "question": "Detailed question text",
-                         "options": ["option1", "option2", "option3", "option4"],
-                         "correctAnswer": "correct option"
-                       }
-                     ]
-                   }`
-          }]
-        }]
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const prompt = `Generate a unique and challenging multiple-choice quiz about ${topic}.
+Ensure the following requirements:
+- Generate exactly ${parsedNumberOfQuestions} questions
+- Each question should test a unique concept or knowledge area
+- Avoid trivial or overly simple questions
+- Provide 4 plausible but distinct answer options
+- Clearly mark the correct answer
+Use this randomization seed: ${quizSeed}
 
-    let responseText = response.data.candidates[0].content.parts[0].text;
+Format strictly as JSON without code fences:
+{
+  "questions": [
+    {
+      "question": "Detailed question text",
+      "options": ["option1", "option2", "option3", "option4"],
+      "correctAnswer": "correct option"
+    }
+  ]
+}`;
+
+    const responseText = await chatCompletion([
+      { role: 'user', content: prompt }
+    ], { temperature: 0.7, max_tokens: 1024 });
     const quizData = parseQuizResponse(responseText, parsedNumberOfQuestions);
 
     // Cache the quiz with the specific number of questions

@@ -1,17 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const axios = require("axios");
 const dotenv = require("dotenv");
 const { protect } = require('../middleware/authMiddleware');
 const CareerPathHistory = require("../models/CareerPathHistory");
 const User = require("../models/User");
+const { generateTextFromPrompt } = require("../utils/nimClient");
 
 dotenv.config();
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-if (!GEMINI_API_KEY) {
-  console.error("❌ Error: Missing GEMINI_API_KEY in environment variables.");
-}
+// NVIDIA NIM is used for all AI endpoints
 
 // Apply authentication to all career routes
 router.use(protect);
@@ -33,13 +29,7 @@ router.post("/generate", async (req, res) => {
       Achievements - ${achievements}.
       Provide a detailed career path with future Trends.`;
 
-    const response = await axios.post(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-002:generateContent?key=${GEMINI_API_KEY}`,
-      { contents: [{ parts: [{ text: prompt }] }] },
-      { headers: { "Content-Type": "application/json" } }
-    );
-
-    const responseText = response.data?.candidates?.[0]?.content?.parts?.[0]?.text || "No response received.";
+    const responseText = await generateTextFromPrompt(prompt);
     
     // Add personalized greeting
     const userName = user.name || 'there';

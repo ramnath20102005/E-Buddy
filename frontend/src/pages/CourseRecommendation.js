@@ -187,7 +187,7 @@ const CourseRecommendation = () => {
                     value={formData.cutoff}
                     onChange={handleInputChange}
                     min="0"
-                    max="100"
+                    max="200"
                     step="0.01"
                     placeholder="Expected cutoff percentage"
                   />
@@ -203,7 +203,7 @@ const CourseRecommendation = () => {
                   >
                     <option value="">Select duration</option>
                     <option value="3 years">3 Years (Bachelor's)</option>
-                    <option value="4 years">4 Years (Engineering/Architecture)</option>
+                    <option value="4 years">4 Years (Engineering)</option>
                     <option value="5 years">5 Years (Integrated)</option>
                     <option value="2 years">2 Years (Diploma)</option>
                   </select>
