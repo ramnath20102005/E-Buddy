@@ -12,6 +12,7 @@ import LearningPath from "./pages/LearningPath";
 import StudyMaterials from "./pages/StudyMaterials";
 import CareerPath from "./pages/CareerPath";
 import Landing from './pages/Landing';
+import Home from './pages/Home';
 import QuizPage from './pages/QuizPage';
 import LearningActivity from './pages/LearningActivity';
 import CareerInsights from './pages/CareerInsights';
@@ -124,150 +125,7 @@ const App = () => {
 
           <Route
             path="/home"
-            element={
-              isAuthenticated ? (
-                <>
-                  <motion.section
-                    className="hero-section"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 0.8 }}
-                    style={{
-                      backgroundImage: "url('/hero-bg.jpg')",
-                      backgroundSize: 'cover',
-                      backgroundPosition: 'center',
-                      backgroundRepeat: 'no-repeat'
-                    }}
-                  >
-                    <div className="hero-content">
-                      <motion.h1 initial="hidden" animate="visible">
-                        {titleText.split("").map((char, i) => (
-                          <motion.span
-                            key={i}
-                            custom={i}
-                            variants={letterAnimation}
-                          >
-                            {char}
-                          </motion.span>
-                        ))}
-                      </motion.h1>
-                      
-                      <motion.p initial="hidden" animate="visible">
-                        {subtitleText.split("").map((char, i) => (
-                          <motion.span
-                            key={i}
-                            custom={i + titleText.length}
-                            variants={letterAnimation}
-                          >
-                            {char}
-                          </motion.span>
-                        ))}
-                      </motion.p>
-                      
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.8 }}
-                      >
-                        <button 
-                          className="cta-button"
-                          onClick={scrollToFeatures}
-                        >
-                          Explore Features
-                        </button>
-                      </motion.div>
-                    </div>
-                  </motion.section>
-
-                  <section className="carousel-section">
-                    <div className="carousel-container">
-                      <div className="carousel">
-                        <div 
-                          className="carousel-inner" 
-                          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-                        >
-                          {carouselImages.map((imgSrc, index) => (
-                            <div 
-                              className={`carousel-item ${index === currentIndex ? 'active' : ''}`} 
-                              key={index}
-                            >
-                              <img 
-                                src={imgSrc} 
-                                alt={`Learning resource ${index + 1}`}
-                                onError={(e) => {
-                                  e.target.onerror = null;
-                                  e.target.src = `https://source.unsplash.com/random/800x400?learning,education${index}`;
-                                }}
-                              />
-                              <div className="carousel-caption">
-                                <h3>Educational Resource {index + 1}</h3>
-                                <p>Enhance your learning journey with our curated materials</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="carousel-progress"></div>
-                        <button 
-                          className="carousel-control prev"
-                          onClick={prevSlide}
-                        >
-                          ❮
-                        </button>
-                        <button 
-                          className="carousel-control next"
-                          onClick={nextSlide}
-                        >
-                          ❯
-                        </button>
-                        <div className="carousel-indicators">
-                          {carouselImages.map((_, index) => (
-                            <button
-                              key={index}
-                              className={index === currentIndex ? 'active' : ''}
-                              onClick={() => goToSlide(index)}
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-
-                  <section className="features-section" ref={featuresRef}>
-                    <div className="section-container">
-                      <motion.h2
-                        className="section-title"
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                      >
-                        Our Key Features
-                      </motion.h2>
-                      
-                      <div className="features-grid">
-                        {features.map((feature, index) => (
-                          <motion.div
-                            key={index}
-                            className="feature-card"
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.3 + index * 0.1 }}
-                            whileHover={{ y: -5 }}
-                          >
-                            <div className="feature-icon">{feature.icon}</div>
-                            <h3>{feature.title}</h3>
-                            <p>{feature.description}</p>
-                          </motion.div>
-                        ))}
-                      </div>
-                    </div>
-                  </section>
-
-                  <Chatbot />
-                </>
-              ) : (
-                <Navigate to="/landing" />
-              )
-            }
+            element={isAuthenticated ? <Home /> : <Navigate to="/landing" />}
           />
 
           <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />

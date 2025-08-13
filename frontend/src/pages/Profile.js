@@ -3,6 +3,25 @@ import { Button, Card, Container, Row, Col, Form, Image, Alert } from 'react-boo
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../Profile.css';
+import { 
+  FaEdit, 
+  FaSave, 
+  FaTimes, 
+  FaSignOutAlt, 
+  FaUser, 
+  FaGraduationCap, 
+  FaLightbulb, 
+  FaTrophy, 
+  FaBookOpen, 
+  FaChartLine,
+  FaCamera,
+  FaTrash,
+  FaPlus,
+  FaStar,
+  FaHeart,
+  FaRocket,
+  FaCheckCircle
+} from 'react-icons/fa';
 
 const Profile = () => {
   const [profileImage, setProfileImage] = useState('');
@@ -17,6 +36,7 @@ const Profile = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
   const navigate = useNavigate();
 
   const defaultProfileImage = '/default-profile.jpg';
@@ -151,6 +171,261 @@ const Profile = () => {
     return arr.filter(item => item.trim()).join(', ') || 'None specified';
   };
 
+  const addSkill = (skill) => {
+    if (skill.trim() && !skills.includes(skill.trim())) {
+      setSkills([...skills, skill.trim()]);
+    }
+  };
+
+  const removeSkill = (index) => {
+    setSkills(skills.filter((_, i) => i !== index));
+  };
+
+  const addInterest = (interest) => {
+    if (interest.trim() && !interests.includes(interest.trim())) {
+      setInterests([...interests, interest.trim()]);
+    }
+  };
+
+  const removeInterest = (index) => {
+    setInterests(interests.filter((_, i) => i !== index));
+  };
+
+  const addAchievement = (achievement) => {
+    if (achievement.trim() && !achievements.includes(achievement.trim())) {
+      setAchievements([...achievements, achievement.trim()]);
+    }
+  };
+
+  const removeAchievement = (index) => {
+    setAchievements(achievements.filter((_, i) => i !== index));
+  };
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return (
+          <div className="tab-content">
+            <Row>
+              <Col md={4}>
+                <Card className="stat-card enhanced">
+                  <Card.Body>
+                    <div className="stat-icon-wrapper">
+                      <FaUser className="stat-icon" />
+                    </div>
+                    <Card.Title>YOUR PROFILE</Card.Title>
+                    <Card.Text className="stat-description">
+                      Keep your profile details updated for better recommendations and networking.
+                    </Card.Text>
+                    <div className="stat-status">
+                      <FaCheckCircle className="status-icon" />
+                      <span>Complete</span>
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col md={4}>
+                <Card 
+                  className="stat-card enhanced hover-shadow" 
+                  onClick={navigateToLearningActivity}
+                >
+                  <Card.Body>
+                    <div className="stat-icon-wrapper">
+                      <FaBookOpen className="stat-icon" />
+                    </div>
+                    <Card.Title>Learning Activity</Card.Title>
+                    <Card.Text className="stat-description">
+                      Track your learning activities and see your course engagement.
+                    </Card.Text>
+                    <div className="stat-action">
+                      <span>View History</span>
+                      <FaRocket className="action-icon" />
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+              <Col md={4}>
+                <Card 
+                  className="stat-card enhanced hover-shadow" 
+                  onClick={navigateToCareerInsights}
+                >
+                  <Card.Body>
+                    <div className="stat-icon-wrapper">
+                      <FaChartLine className="stat-icon" />
+                    </div>
+                    <Card.Title>Career Insights</Card.Title>
+                    <Card.Text className="stat-description">
+                      Get personalized career suggestions and skill-building insights.
+                    </Card.Text>
+                    <div className="stat-action">
+                      <span>Get Insights</span>
+                      <FaRocket className="action-icon" />
+                    </div>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          </div>
+        );
+
+      case 'skills':
+        return (
+          <div className="tab-content">
+            <div className="skills-section">
+              <h4 className="section-title">Skills & Expertise</h4>
+              <div className="skills-grid">
+                {skills.map((skill, index) => (
+                  <div key={index} className="skill-tag">
+                    <FaStar className="skill-icon" />
+                    <span>{skill}</span>
+                    {isEditing && (
+                      <button 
+                        className="remove-tag-btn"
+                        onClick={() => removeSkill(index)}
+                      >
+                        <FaTimes />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {isEditing && (
+                <div className="add-item-form">
+                  <input
+                    type="text"
+                    placeholder="Add a new skill"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        addSkill(e.target.value);
+                        e.target.value = '';
+                      }
+                    }}
+                    className="add-item-input"
+                  />
+                  <Button 
+                    variant="outline-primary" 
+                    size="sm"
+                    onClick={(e) => {
+                      const input = e.target.previousSibling;
+                      addSkill(input.value);
+                      input.value = '';
+                    }}
+                  >
+                    <FaPlus />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'interests':
+        return (
+          <div className="tab-content">
+            <div className="interests-section">
+              <h4 className="section-title">Personal Interests</h4>
+              <div className="interests-grid">
+                {interests.map((interest, index) => (
+                  <div key={index} className="interest-tag">
+                    <FaHeart className="interest-icon" />
+                    <span>{interest}</span>
+                    {isEditing && (
+                      <button 
+                        className="remove-tag-btn"
+                        onClick={() => removeInterest(index)}
+                      >
+                        <FaTimes />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {isEditing && (
+                <div className="add-item-form">
+                  <input
+                    type="text"
+                    placeholder="Add a new interest"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        addInterest(e.target.value);
+                        e.target.value = '';
+                      }
+                    }}
+                    className="add-item-input"
+                  />
+                  <Button 
+                    variant="outline-primary" 
+                    size="sm"
+                    onClick={(e) => {
+                      const input = e.target.previousSibling;
+                      addInterest(input.value);
+                      input.value = '';
+                    }}
+                  >
+                    <FaPlus />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'achievements':
+        return (
+          <div className="tab-content">
+            <div className="achievements-section">
+              <h4 className="section-title">Achievements & Certifications</h4>
+              <div className="achievements-grid">
+                {achievements.map((achievement, index) => (
+                  <div key={index} className="achievement-tag">
+                    <FaTrophy className="achievement-icon" />
+                    <span>{achievement}</span>
+                    {isEditing && (
+                      <button 
+                        className="remove-tag-btn"
+                        onClick={() => removeAchievement(index)}
+                      >
+                        <FaTimes />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+              {isEditing && (
+                <div className="add-item-form">
+                  <input
+                    type="text"
+                    placeholder="Add a new achievement"
+                    onKeyPress={(e) => {
+                      if (e.key === 'Enter') {
+                        addAchievement(e.target.value);
+                        e.target.value = '';
+                      }
+                    }}
+                    className="add-item-input"
+                  />
+                  <Button 
+                    variant="outline-primary" 
+                    size="sm"
+                    onClick={(e) => {
+                      const input = e.target.previousSibling;
+                      addAchievement(input.value);
+                      input.value = '';
+                    }}
+                  >
+                    <FaPlus />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      default:
+        return null;
+    }
+  };
+
   return (
     <Container className="profile-container">
       <Card className="profile-card">
@@ -164,6 +439,20 @@ const Profile = () => {
                   className="profile-image"
                   alt="Profile"
                 />
+                {isEditing && (
+                  <div className="image-overlay">
+                    <label htmlFor="profileImage" className="image-upload-btn">
+                      <FaCamera />
+                    </label>
+                    <input
+                      id="profileImage"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      style={{ display: 'none' }}
+                    />
+                  </div>
+                )}
               </div>
               <h5 className="profile-name">{name || 'User Name'}</h5>
               <p className="profile-email">{email}</p>
@@ -172,17 +461,19 @@ const Profile = () => {
                 {!isEditing ? (
                   <>
                     <Button 
-                      className="edit-btn" 
+                      className="edit-btn enhanced" 
                       onClick={() => setIsEditing(true)}
                       disabled={isLoading}
                     >
-                      {isLoading ? 'Loading...' : 'Edit Profile'}
+                      <FaEdit className="btn-icon" />
+                      Edit Profile
                     </Button>
                     <Button 
-                      className="logout-btn" 
+                      className="logout-btn enhanced" 
                       onClick={handleLogout}
                       disabled={isLoading}
                     >
+                      <FaSignOutAlt className="btn-icon" />
                       Logout
                     </Button>
                   </>
@@ -191,18 +482,20 @@ const Profile = () => {
                     <Button 
                       variant="primary" 
                       type="submit" 
-                      className="save-btn" 
+                      className="save-btn enhanced" 
                       form="editForm"
                       disabled={isLoading}
                     >
+                      <FaSave className="btn-icon" />
                       {isLoading ? 'Saving...' : 'Save Changes'}
                     </Button>
                     <Button 
                       variant="secondary" 
-                      className="cancel-btn" 
+                      className="cancel-btn enhanced" 
                       onClick={() => setIsEditing(false)}
                       disabled={isLoading}
                     >
+                      <FaTimes className="btn-icon" />
                       Cancel
                     </Button>
                   </div>
@@ -212,49 +505,37 @@ const Profile = () => {
 
             {!isEditing && (
               <Col md={8} className="stats-section">
-                <h4 className="section-title mb-3">Your Dashboard Overview</h4>
-                <Row>
-                  <Col md={4}>
-                    <Card className="stat-card">
-                      <Card.Body>
-                        <Card.Title>YOUR PROFILE</Card.Title>
-                        <Card.Text className="stat-description">
-                          Keep your profile details updated for better recommendations and networking.
-                        </Card.Text>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                  <Col md={4}>
-                    <Card 
-                      className="stat-card hover-shadow" 
-                      onClick={navigateToLearningActivity}
-                      style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
-                    >
-                      <Card.Body>
-                        <Card.Title>Learning Activity</Card.Title>
-                        <Card.Text className="stat-description">
-                          Track your learning activities and see your course engagement.
-                        </Card.Text>
-                        <div className="text-end text-primary">View History →</div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                  <Col md={4}>
-                    <Card 
-                      className="stat-card hover-shadow" 
-                      onClick={navigateToCareerInsights}
-                      style={{ cursor: 'pointer', transition: 'all 0.3s ease' }}
-                    >
-                      <Card.Body>
-                        <Card.Title>Recent Career Insights</Card.Title>
-                        <Card.Text className="stat-description">
-                          Get personalized career suggestions and skill-building insights.
-                        </Card.Text>
-                        <div className="text-end text-primary">View History →</div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                </Row>
+                <div className="tabs-navigation">
+                  <button 
+                    className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('overview')}
+                  >
+                    <FaUser className="tab-icon" />
+                    Overview
+                  </button>
+                  <button 
+                    className={`tab-btn ${activeTab === 'skills' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('skills')}
+                  >
+                    <FaGraduationCap className="tab-icon" />
+                    Skills
+                  </button>
+                  <button 
+                    className={`tab-btn ${activeTab === 'interests' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('interests')}
+                  >
+                    <FaLightbulb className="tab-icon" />
+                    Interests
+                  </button>
+                  <button 
+                    className={`tab-btn ${activeTab === 'achievements' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('achievements')}
+                  >
+                    <FaTrophy className="tab-icon" />
+                    Achievements
+                  </button>
+                </div>
+                {renderTabContent()}
               </Col>
             )}
           </Row>
@@ -262,110 +543,68 @@ const Profile = () => {
           <Row className="personal-info-section">
             <Col>
               {isEditing ? (
-                <Form id="editForm" className="edit-profile-form" onSubmit={handleSubmit}>
+                <Form id="editForm" className="edit-profile-form enhanced" onSubmit={handleSubmit}>
                   {error && <Alert variant="danger">{error}</Alert>}
                   {success && <Alert variant="success">{success}</Alert>}
                   
                   <Row>
                     <Col md={6}>
-                      <Form.Group controlId="profileImage" className="mb-4">
-                        <Form.Label className="form-label">Profile Image</Form.Label>
-                        <div className="d-flex align-items-center">
-                          <Form.Control 
-                            type="file" 
-                            accept="image/*" 
-                            onChange={handleImageChange}
-                            className="form-control-file"
-                            disabled={isLoading}
-                          />
-                          <Button 
-                            variant="danger" 
-                            size="sm" 
-                            onClick={() => setProfileImage(defaultProfileImage)} 
-                            className="remove-btn ms-2"
-                            disabled={isLoading}
-                          >
-                            Remove Profile Image
-                          </Button>
-                        </div>
-                      </Form.Group>
-
                       <Form.Group controlId="name" className="mb-4">
-                        <Form.Label className="form-label">Name</Form.Label>
+                        <Form.Label className="form-label">
+                          <FaUser className="label-icon" />
+                          Full Name
+                        </Form.Label>
                         <Form.Control 
                           type="text" 
                           value={name} 
                           onChange={(e) => setName(e.target.value)} 
-                          className="form-input"
+                          className="form-input enhanced"
+                          placeholder="Enter your full name"
                           disabled={isLoading}
                         />
                       </Form.Group>
                       
                       <Form.Group controlId="bio" className="mb-4">
-                        <Form.Label className="form-label">Bio</Form.Label>
+                        <Form.Label className="form-label">
+                          <FaUser className="label-icon" />
+                          Bio
+                        </Form.Label>
                         <Form.Control 
                           as="textarea" 
                           rows={4} 
                           value={bio} 
                           onChange={(e) => setBio(e.target.value)}
-                          className="form-textarea"
+                          className="form-textarea enhanced"
+                          placeholder="Tell us about yourself..."
                           disabled={isLoading}
                         />
                       </Form.Group>
                     </Col>
                     
                     <Col md={6}>
-                      <Form.Group controlId="skills" className="mb-4">
-                        <Form.Label className="form-label">Skills (comma separated)</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={Array.isArray(skills) ? skills.join(', ') : skills}
-                          onChange={(e) => setSkills(e.target.value.split(',').map(skill => skill.trim()))}
-                          className="form-input"
-                          placeholder="e.g. JavaScript, React, Node.js"
-                          disabled={isLoading}
-                        />
-                      </Form.Group>
-                      
-                      <Form.Group controlId="interests" className="mb-4">
-                        <Form.Label className="form-label">Interests (comma separated)</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={Array.isArray(interests) ? interests.join(', ') : interests}
-                          onChange={(e) => setInterests(e.target.value.split(',').map(interest => interest.trim()))}
-                          className="form-input"
-                          placeholder="e.g. Hiking, Reading, Music"
-                          disabled={isLoading}
-                        />
-                      </Form.Group>
-                      
-                      <Form.Group controlId="achievements" className="mb-4">
-                        <Form.Label className="form-label">Achievements (comma separated)</Form.Label>
-                        <Form.Control
-                          type="text"
-                          value={Array.isArray(achievements) ? achievements.join(', ') : achievements}
-                          onChange={(e) => setAchievements(e.target.value.split(',').map(cert => cert.trim()))}
-                          className="form-input"
-                          placeholder="e.g. AWS Certified, Google Analytics"
-                          disabled={isLoading}
-                        />
+                      <Form.Group controlId="educationLevel" className="mb-4">
+                        <Form.Label className="form-label">
+                          <FaGraduationCap className="label-icon" />
+                          Education Level
+                        </Form.Label>
+                        <Form.Select className="form-select enhanced">
+                          <option>High School</option>
+                          <option>Undergraduate</option>
+                          <option>Graduate</option>
+                          <option>Professional</option>
+                          <option>Other</option>
+                        </Form.Select>
                       </Form.Group>
                     </Col>
                   </Row>
                 </Form>
               ) : (
-                <div className="info-display">
-                  <h4 className="section-title">About Me</h4>
+                <div className="info-display enhanced">
+                  <h4 className="section-title">
+                    <FaUser className="title-icon" />
+                    About Me
+                  </h4>
                   <p className="bio-text">{bio || 'No bio available'}</p>
-                  
-                  <h4 className="section-title">Skills</h4>
-                  <p className="bio-text">{cleanArrayDisplay(skills)}</p>
-                  
-                  <h4 className="section-title">Interests</h4>
-                  <p className="bio-text">{cleanArrayDisplay(interests)}</p>
-                  
-                  <h4 className="section-title">Achievements</h4>
-                  <p className="bio-text">{cleanArrayDisplay(achievements)}</p>
                 </div>
               )}
             </Col>

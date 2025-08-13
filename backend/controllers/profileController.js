@@ -1,5 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const User = require("../models/User");
+const LearningPathHistory = require("../models/LearningPathHistory");
+const CareerPathHistory = require("../models/CareerPathHistory");
 
 // @desc    Get user profile
 // @route   GET /api/profile
@@ -56,3 +58,21 @@ const updateProfile = asyncHandler(async (req, res) => {
 });
 
 module.exports = { getProfile, updateProfile };
+
+// @desc    Get learning path history for current user
+// @route   GET /api/profile/learning-history
+// @access  Private
+const getLearningHistory = asyncHandler(async (req, res) => {
+  const history = await LearningPathHistory.find({ userId: req.user._id }).sort({ createdAt: -1 });
+  res.json(history);
+});
+
+// @desc    Get career path history for current user
+// @route   GET /api/profile/career-history
+// @access  Private
+const getCareerHistory = asyncHandler(async (req, res) => {
+  const history = await CareerPathHistory.find({ userId: req.user._id }).sort({ createdAt: -1 });
+  res.json(history);
+});
+
+module.exports = { getProfile, updateProfile, getLearningHistory, getCareerHistory };
