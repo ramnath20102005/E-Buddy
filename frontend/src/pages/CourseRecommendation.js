@@ -570,7 +570,7 @@ const CourseRecommendation = () => {
                   }
                   // Convert bullet points
                   if (line.startsWith('• ')) {
-                    return `<div class="ai-bullet-point">${line}</div>`;
+                    return `<div class="ai-bullet-point">${line.substring(2)}</div>`;
                   }
                   // Convert numbered points
                   if (line.match(/^\d+️⃣\s/)) {
@@ -599,19 +599,6 @@ const CourseRecommendation = () => {
               Please verify all information with official sources before making decisions.
             </div>
           </div>
-          <motion.button 
-            className="btn btn-primary"
-            onClick={() => {
-              setRecommendations(null);
-              setCurrentStep(1);
-              setFormProgress(0);
-            }}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <FaRocket className="btn-icon" />
-            Get New Recommendations
-          </motion.button>
         </div>
       </div>
     );
@@ -658,74 +645,101 @@ const CourseRecommendation = () => {
 
         {/* Content Section */}
         <div className="learning-content">
-          {!recommendations ? (
-            <div className="learning-sidebar">
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, delay: 0.4 }}
-              >
-                <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '20px', color: 'var(--gray-800)' }}>
-                  <FaCrosshairs style={{ marginRight: '10px', color: 'var(--primary-blue)' }} />
-                  Recommendation Form
-                </h2>
-                
-                {renderStepIndicator()}
-                
-                <form onSubmit={handleSubmit} className="learning-form">
-                  {renderFormStep()}
+          <div className="learning-sidebar">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '20px', color: 'var(--gray-800)' }}>
+                <FaCrosshairs style={{ marginRight: '10px', color: 'var(--primary-blue)' }} />
+                Recommendation Form
+              </h2>
+              
+              {!recommendations ? (
+                <>
+                  {renderStepIndicator()}
                   
-                  <div className="form-navigation">
-                    {currentStep > 1 && (
-                      <motion.button 
-                        type="button" 
-                        className="btn btn-outline"
-                        onClick={prevStep}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <FaArrowLeft style={{ marginRight: '8px' }} />
-                        Previous
-                      </motion.button>
-                    )}
+                  <form onSubmit={handleSubmit} className="learning-form">
+                    {renderFormStep()}
                     
-                    {currentStep < totalSteps ? (
-                      <motion.button 
-                        type="button" 
-                        className="btn btn-primary"
-                        onClick={nextStep}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        Next
-                        <FaArrowRight style={{ marginLeft: '8px' }} />
-                      </motion.button>
-                    ) : (
-                      <motion.button 
-                        type="submit" 
-                        className="btn btn-success"
-                        disabled={loading}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        {loading ? (
-                          <>
-                            <div className="spinner" style={{ width: '20px', height: '20px', margin: '0' }}></div>
-                            Generating Recommendations...
-                          </>
-                        ) : (
-                          <>
-                            <FaUniversity style={{ marginRight: '8px' }} />
-                            Get Recommendations
-                          </>
-                        )}
-                      </motion.button>
-                    )}
+                    <div className="form-navigation">
+                      {currentStep > 1 && (
+                        <motion.button 
+                          type="button" 
+                          className="btn btn-outline"
+                          onClick={prevStep}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <FaArrowLeft style={{ marginRight: '8px' }} />
+                          Previous
+                        </motion.button>
+                      )}
+                      
+                      {currentStep < totalSteps ? (
+                        <motion.button 
+                          type="button" 
+                          className="btn btn-primary"
+                          onClick={nextStep}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          Next
+                          <FaArrowRight style={{ marginLeft: '8px' }} />
+                        </motion.button>
+                      ) : (
+                        <motion.button 
+                          type="submit" 
+                          className="btn btn-success"
+                          disabled={loading}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          {loading ? (
+                            <>
+                              <div className="spinner" style={{ width: '20px', height: '20px', margin: '0' }}></div>
+                              Generating Recommendations...
+                            </>
+                          ) : (
+                            <>
+                              <FaUniversity style={{ marginRight: '8px' }} />
+                              Get Recommendations
+                            </>
+                          )}
+                        </motion.button>
+                      )}
+                    </div>
+                  </form>
+                </>
+              ) : (
+                <div className="form-summary">
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: '700', marginBottom: '16px', color: 'var(--gray-800)' }}>
+                    <FaCheckCircle style={{ marginRight: '10px', color: 'var(--accent-green)' }} />
+                    Form Completed
+                  </h3>
+                  <div className="summary-content">
+                    <p style={{ color: 'var(--gray-600)', marginBottom: '16px' }}>
+                      Your recommendations have been generated successfully!
+                    </p>
+                    <motion.button
+                      className="btn btn-outline"
+                      onClick={() => {
+                        setRecommendations(null);
+                        setCurrentStep(1);
+                        setFormProgress(0);
+                      }}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <FaRocket style={{ marginRight: '8px' }} />
+                      New Recommendations
+                    </motion.button>
                   </div>
-                </form>
-              </motion.div>
-            </div>
-          ) : null}
+                </div>
+              )}
+            </motion.div>
+          </div>
 
           <div className="learning-main">
             <motion.div
@@ -733,23 +747,36 @@ const CourseRecommendation = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
-              {error && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="card"
-                  style={{ 
-                    background: 'rgba(239, 68, 68, 0.1)', 
-                    border: '1px solid var(--accent-red)',
-                    color: 'var(--accent-red)'
-                  }}
-                >
-                  <FaExclamationTriangle style={{ marginRight: '8px' }} />
-                  {error}
-                </motion.div>
-              )}
+              {!recommendations ? (
+                <div className="placeholder-container">
+                  <div className="placeholder-icon">🎓</div>
+                  <div className="placeholder-text">Ready to get recommendations?</div>
+                  <div className="placeholder-subtext">
+                    Fill out the form on the left to receive personalized course and college suggestions
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="card"
+                      style={{ 
+                        background: 'rgba(239, 68, 68, 0.1)', 
+                        border: '1px solid var(--accent-red)',
+                        color: 'var(--accent-red)',
+                        marginBottom: '24px'
+                      }}
+                    >
+                      <FaExclamationTriangle style={{ marginRight: '8px' }} />
+                      {error}
+                    </motion.div>
+                  )}
 
-              {renderRecommendations()}
+                  {renderRecommendations()}
+                </>
+              )}
             </motion.div>
           </div>
         </div>
