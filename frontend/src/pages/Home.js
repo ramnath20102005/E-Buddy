@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import '../Home.css';
+import Chatbot from '../components/Chatbot';
 import {
   FaRobot, FaGraduationCap, FaChartLine, FaAward, FaRocket, FaUsers, FaBookOpen, FaArrowRight, FaStar, FaCheckCircle, FaUser, FaLightbulb, FaHeadset
 } from 'react-icons/fa';
@@ -23,10 +24,9 @@ const Home = () => {
   ];
 
   const stats = [
-    { number: '10K+', label: 'Active Learners', icon: <FaUsers /> },
-    { number: '95%', label: 'Success Rate', icon: <FaAward /> },
+    { number: '', label: 'Active Learners', icon: <FaUsers /> },
+    { number: '', label: 'Success Rate', icon: <FaAward /> },
     { number: '24/7', label: 'AI Support', icon: <FaRobot /> },
-    { number: '500+', label: 'Courses', icon: <FaBookOpen /> }
   ];
 
   const testimonials = [
@@ -186,57 +186,6 @@ const Home = () => {
         </motion.div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="testimonials-section">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="section-header"
-        >
-          <h2 className="section-title">What Our Users Say</h2>
-          <p className="section-subtitle">Join thousands of satisfied learners</p>
-        </motion.div>
-        <div className="testimonials-grid">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={testimonial.author}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -10 }}
-              className={`testimonial-card${index === currentTestimonial ? ' active' : ''}`}
-              style={{ display: index === currentTestimonial ? 'block' : 'none' }}
-            >
-              <div className="testimonial-header">
-                <div className="testimonial-avatar">{testimonial.avatar}</div>
-                <div className="testimonial-rating">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <FaStar key={i} className="star-icon" />
-                  ))}
-                </div>
-              </div>
-              <p className="testimonial-text">{testimonial.text}</p>
-              <div className="testimonial-author">
-                <strong>{testimonial.author}</strong>
-                <span>{testimonial.role}</span>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-        <div className="testimonial-indicators">
-          {testimonials.map((_, idx) => (
-            <button
-              key={idx}
-              className={`indicator ${idx === currentTestimonial ? 'active' : ''}`}
-              onClick={() => setCurrentTestimonial(idx)}
-            />
-          ))}
-        </div>
-      </section>
-
       {/* Final CTA Section */}
       <section className="final-cta-section">
         <motion.div
@@ -263,6 +212,9 @@ const Home = () => {
           <p className="cta-note">No credit card required • Start immediately</p>
         </motion.div>
       </section>
+
+      {/* Chatbot Component */}
+      <Chatbot />
     </motion.div>
   );
 };

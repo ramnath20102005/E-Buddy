@@ -14,7 +14,7 @@ const Navbar = ({ isAuthenticated, logout }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null); // 'learn' | 'career' | 'me' | null
   const [searchQuery, setSearchQuery] = useState('');
-  const [theme, setTheme] = useState(() => localStorage.getItem('navTheme') || 'dark');
+  const [theme, setTheme] = useState(() => localStorage.getItem('navTheme') || 'light');
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -42,6 +42,8 @@ const Navbar = ({ isAuthenticated, logout }) => {
 
   useEffect(() => {
     localStorage.setItem('navTheme', theme);
+    // Apply theme to body for global consistency
+    document.body.setAttribute('data-theme', theme);
   }, [theme]);
 
   const handleLogout = () => {
@@ -64,8 +66,12 @@ const Navbar = ({ isAuthenticated, logout }) => {
     setOpenDropdown(null);
   };
 
+  const toggleTheme = () => {
+    setTheme(prev => prev === 'light' ? 'dark' : 'light');
+  };
+
   return (
-    <nav className={`navbar ${scrolled ? 'scrolled' : ''} ${theme === 'light' ? 'theme-light' : 'theme-dark'}`}>
+    <nav className={`navbar ${scrolled ? 'scrolled' : ''} ${theme === 'dark' ? 'theme-dark' : ''}`}>
       <div className="nav-inner">
         {/* Brand */}
         <Link to="/home" className="logo" onClick={closeAllMenus} aria-label="E-Buddy Home">
@@ -91,7 +97,7 @@ const Navbar = ({ isAuthenticated, logout }) => {
         <div className="right-controls">
           <button
             className="theme-toggle"
-            onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+            onClick={toggleTheme}
             aria-label={theme === 'light' ? 'Switch to dark theme' : 'Switch to light theme'}
             title="Toggle theme"
           >

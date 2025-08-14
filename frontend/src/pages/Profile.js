@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Container, Row, Col, Form, Image, Alert } from 'react-bootstrap';
+import { Button, Card, Container, Row, Col, Form, Image, Alert, ProgressBar } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../Profile.css';
@@ -40,6 +40,27 @@ const Profile = () => {
   const navigate = useNavigate();
 
   const defaultProfileImage = '/default-profile.jpg';
+
+  // Calculate profile completion percentage
+  const calculateProfileCompletion = () => {
+    const fields = [
+      { value: name, isString: true },
+      { value: bio, isString: true },
+      { value: skills, isArray: true },
+      { value: interests, isArray: true }
+    ];
+    
+    const completedFields = fields.filter(field => {
+      if (field.isString) {
+        return field.value && field.value.trim() !== '';
+      } else if (field.isArray) {
+        return Array.isArray(field.value) && field.value.length > 0;
+      }
+      return false;
+    }).length;
+    
+    return Math.round((completedFields / fields.length) * 100);
+  };
 
   const fetchProfile = async () => {
     const token = localStorage.getItem('token');
@@ -217,9 +238,14 @@ const Profile = () => {
                     <Card.Text className="stat-description">
                       Keep your profile details updated for better recommendations and networking.
                     </Card.Text>
-                    <div className="stat-status">
-                      <FaCheckCircle className="status-icon" />
-                      <span>Complete</span>
+                    <div className="profile-completion">
+                      <ProgressBar 
+                        now={calculateProfileCompletion()} 
+                        variant="success" 
+                        className="mb-2"
+                        style={{ height: '8px' }}
+                      />
+                      <small className="text-muted">{calculateProfileCompletion()}% Complete</small>
                     </div>
                   </Card.Body>
                 </Card>
@@ -552,7 +578,7 @@ const Profile = () => {
                       <Form.Group controlId="name" className="mb-4">
                         <Form.Label className="form-label">
                           <FaUser className="label-icon" />
-                          Full Name
+                          Full Name *
                         </Form.Label>
                         <Form.Control 
                           type="text" 
@@ -561,6 +587,7 @@ const Profile = () => {
                           className="form-input enhanced"
                           placeholder="Enter your full name"
                           disabled={isLoading}
+                          required
                         />
                       </Form.Group>
                       
@@ -582,18 +609,182 @@ const Profile = () => {
                     </Col>
                     
                     <Col md={6}>
-                      <Form.Group controlId="educationLevel" className="mb-4">
+                      <div className="info-display enhanced">
+                        <h6 className="section-subtitle">
+                          <FaGraduationCap className="label-icon" />
+                          Profile Completion
+                        </h6>
+                        <p className="text-muted small">
+                          Complete your profile by adding your bio and ensuring you have skills and interests listed.
+                        </p>
+                        <div className="profile-completion-mini">
+                          <ProgressBar 
+                            now={calculateProfileCompletion()} 
+                            variant="success" 
+                            className="mb-2"
+                            style={{ height: '6px' }}
+                          />
+                          <small className="text-muted">{calculateProfileCompletion()}% Complete</small>
+                        </div>
+                      </div>
+                    </Col>
+                  </Row>
+
+                  {/* Skills Section */}
+                  <Row className="mt-4">
+                    <Col>
+                      <Form.Group controlId="skills" className="mb-4">
                         <Form.Label className="form-label">
                           <FaGraduationCap className="label-icon" />
-                          Education Level
+                          Skills & Expertise
                         </Form.Label>
-                        <Form.Select className="form-select enhanced">
-                          <option>High School</option>
-                          <option>Undergraduate</option>
-                          <option>Graduate</option>
-                          <option>Professional</option>
-                          <option>Other</option>
-                        </Form.Select>
+                        <div className="skills-grid mb-3">
+                          {skills.map((skill, index) => (
+                            <div key={index} className="skill-tag">
+                              <FaStar className="skill-icon" />
+                              <span>{skill}</span>
+                              <button 
+                                type="button"
+                                className="remove-tag-btn"
+                                onClick={() => removeSkill(index)}
+                              >
+                                <FaTimes />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="add-item-form">
+                          <input
+                            type="text"
+                            placeholder="Add a new skill"
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addSkill(e.target.value);
+                                e.target.value = '';
+                              }
+                            }}
+                            className="add-item-input"
+                          />
+                          <Button 
+                            type="button"
+                            variant="outline-primary" 
+                            size="sm"
+                            onClick={(e) => {
+                              const input = e.target.previousSibling;
+                              addSkill(input.value);
+                              input.value = '';
+                            }}
+                          >
+                            <FaPlus />
+                          </Button>
+                        </div>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  {/* Interests Section */}
+                  <Row className="mt-4">
+                    <Col>
+                      <Form.Group controlId="interests" className="mb-4">
+                        <Form.Label className="form-label">
+                          <FaLightbulb className="label-icon" />
+                          Personal Interests
+                        </Form.Label>
+                        <div className="interests-grid mb-3">
+                          {interests.map((interest, index) => (
+                            <div key={index} className="interest-tag">
+                              <FaHeart className="interest-icon" />
+                              <span>{interest}</span>
+                              <button 
+                                type="button"
+                                className="remove-tag-btn"
+                                onClick={() => removeInterest(index)}
+                              >
+                                <FaTimes />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="add-item-form">
+                          <input
+                            type="text"
+                            placeholder="Add a new interest"
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addInterest(e.target.value);
+                                e.target.value = '';
+                              }
+                            }}
+                            className="add-item-input"
+                          />
+                          <Button 
+                            type="button"
+                            variant="outline-primary" 
+                            size="sm"
+                            onClick={(e) => {
+                              const input = e.target.previousSibling;
+                              addInterest(input.value);
+                              input.value = '';
+                            }}
+                          >
+                            <FaPlus />
+                          </Button>
+                        </div>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  {/* Achievements Section */}
+                  <Row className="mt-4">
+                    <Col>
+                      <Form.Group controlId="achievements" className="mb-4">
+                        <Form.Label className="form-label">
+                          <FaTrophy className="label-icon" />
+                          Achievements & Certifications
+                        </Form.Label>
+                        <div className="achievements-grid mb-3">
+                          {achievements.map((achievement, index) => (
+                            <div key={index} className="achievement-tag">
+                              <FaTrophy className="achievement-icon" />
+                              <span>{achievement}</span>
+                              <button 
+                                type="button"
+                                className="remove-tag-btn"
+                                onClick={() => removeAchievement(index)}
+                              >
+                                <FaTimes />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="add-item-form">
+                          <input
+                            type="text"
+                            placeholder="Add a new achievement"
+                            onKeyPress={(e) => {
+                              if (e.key === 'Enter') {
+                                e.preventDefault();
+                                addAchievement(e.target.value);
+                                e.target.value = '';
+                              }
+                            }}
+                            className="add-item-input"
+                          />
+                          <Button 
+                            type="button"
+                            variant="outline-primary" 
+                            size="sm"
+                            onClick={(e) => {
+                              const input = e.target.previousSibling;
+                              addAchievement(input.value);
+                              input.value = '';
+                            }}
+                          >
+                            <FaPlus />
+                          </Button>
+                        </div>
                       </Form.Group>
                     </Col>
                   </Row>

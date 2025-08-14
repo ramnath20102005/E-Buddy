@@ -382,6 +382,169 @@ const CourseRecommendation = () => {
   const renderRecommendations = () => {
     if (!recommendations) return null;
 
+    // Function to format AI response with better visual elements
+    const formatAIResponse = (response) => {
+      if (!response) return 'No recommendations available.';
+
+      let formattedResponse = response;
+
+      // Add emojis and visual elements to common patterns
+      formattedResponse = formattedResponse
+        // Course recommendations
+        .replace(/(\b)(Computer Science|Engineering|Medicine|Business|Arts|Science|Commerce)(\b)/gi, '$1🎓 $2$3')
+        .replace(/(\b)(Bachelor|Master|PhD|Diploma|Certificate)(\b)/gi, '$1🎯 $2$3')
+        
+        // Colleges and universities
+        .replace(/(\b)(IIT|NIT|AIIMS|Delhi University|Mumbai University|Bangalore University)(\b)/gi, '$1🏛️ $2$3')
+        .replace(/(\b)(University|College|Institute|School)(\b)/gi, '$1🏫 $2$3')
+        
+        // Subjects and skills
+        .replace(/(\b)(Mathematics|Physics|Chemistry|Biology|English|History|Geography)(\b)/gi, '$1📚 $2$3')
+        .replace(/(\b)(Programming|Coding|Development|Design|Analysis|Research)(\b)/gi, '$1💻 $2$3')
+        
+        // Career aspects
+        .replace(/(\b)(Career|Job|Employment|Salary|Growth|Opportunity)(\b)/gi, '$1💼 $2$3')
+        .replace(/(\b)(Future|Prospects|Scope|Demand|Market)(\b)/gi, '$1🚀 $2$3')
+        
+        // Financial aspects
+        .replace(/(\b)(Budget|Cost|Fee|Expense|Affordable|Expensive)(\b)/gi, '$1💰 $2$3')
+        .replace(/(\b)(Scholarship|Financial Aid|Loan|Grant)(\b)/gi, '$1🎁 $2$3')
+        
+        // Location and region
+        .replace(/(\b)(Delhi|Mumbai|Bangalore|Chennai|Kolkata|Hyderabad|Pune)(\b)/gi, '$1📍 $2$3')
+        .replace(/(\b)(North|South|East|West|Central|India|International)(\b)/gi, '$1🌍 $2$3')
+        
+        // Time and duration
+        .replace(/(\b)(Duration|Years|Months|Semester|Academic Year)(\b)/gi, '$1⏰ $2$3')
+        .replace(/(\b)(Full-time|Part-time|Online|Distance|Regular)(\b)/gi, '$1📅 $2$3')
+        
+        // Quality indicators
+        .replace(/(\b)(Excellent|Good|Best|Top|Reputed|Famous)(\b)/gi, '$1⭐ $2$3')
+        .replace(/(\b)(Accredited|Recognized|Approved|Certified)(\b)/gi, '$1✅ $2$3')
+        
+        // Numbers and percentages
+        .replace(/(\b)(\d+%)(\b)/g, '$1📊 $2$3')
+        .replace(/(\b)(\d+ years?)(\b)/gi, '$1⏳ $2$3')
+        
+        // Lists and bullet points
+        .replace(/^[-*]\s+/gm, '• ')
+        .replace(/^(\d+)\.\s+/gm, '$1️⃣ ')
+        
+        // Headers and sections
+        .replace(/^(.*?):\s*$/gm, '## 📋 $1:')
+        .replace(/^(.*?)\n[-=]{3,}/gm, '## 🎯 $1')
+        
+        // Important keywords
+        .replace(/(\b)(Important|Note|Remember|Consider|Advice)(\b)/gi, '$1💡 $2$3')
+        .replace(/(\b)(Benefits|Advantages|Pros|Features)(\b)/gi, '$1✨ $2$3')
+        .replace(/(\b)(Challenges|Disadvantages|Cons|Limitations)(\b)/gi, '$1⚠️ $2$3');
+
+      // Convert structured data to tables
+      formattedResponse = formattedResponse
+        // Course details table
+        .replace(
+          /Course Details:?\s*\n((?:.*?\n)*?)(?=\n|$)/gi,
+          (match, content) => {
+            const lines = content.trim().split('\n').filter(line => line.trim());
+            if (lines.length > 0) {
+              let table = '\n📊 **Course Details:**\n\n';
+              table += '| Aspect | Details |\n';
+              table += '|--------|---------|\n';
+              lines.forEach(line => {
+                const [key, value] = line.split(':').map(s => s.trim());
+                if (key && value) {
+                  table += `| ${key} | ${value} |\n`;
+                }
+              });
+              return table;
+            }
+            return match;
+          }
+        )
+        
+        // College recommendations table
+        .replace(
+          /(?:Recommended|Top|Best) Colleges?:?\s*\n((?:.*?\n)*?)(?=\n|$)/gi,
+          (match, content) => {
+            const lines = content.trim().split('\n').filter(line => line.trim());
+            if (lines.length > 0) {
+              let table = '\n🏛️ **Recommended Colleges:**\n\n';
+              table += '| Rank | College Name | Location | Rating |\n';
+              table += '|------|--------------|----------|--------|\n';
+              lines.forEach((line, index) => {
+                const parts = line.split(',').map(s => s.trim());
+                const college = parts[0] || line;
+                const location = parts[1] || 'N/A';
+                const rating = parts[2] || '⭐⭐⭐⭐⭐';
+                table += `| ${index + 1}️⃣ | ${college} | ${location} | ${rating} |\n`;
+              });
+              return table;
+            }
+            return match;
+          }
+        )
+        
+        // Career prospects table
+        .replace(
+          /Career Prospects?:?\s*\n((?:.*?\n)*?)(?=\n|$)/gi,
+          (match, content) => {
+            const lines = content.trim().split('\n').filter(line => line.trim());
+            if (lines.length > 0) {
+              let table = '\n💼 **Career Prospects:**\n\n';
+              table += '| Job Role | Salary Range | Growth |\n';
+              table += '|----------|--------------|--------|\n';
+              lines.forEach(line => {
+                const [role, salary, growth] = line.split('|').map(s => s.trim());
+                if (role) {
+                  table += `| ${role} | ${salary || 'Competitive'} | ${growth || 'High'} |\n`;
+                }
+              });
+              return table;
+            }
+            return match;
+          }
+        );
+
+      // Add visual separators and formatting
+      formattedResponse = formattedResponse
+        // Add stars for ratings
+        .replace(/(\b)(5|4|3|2|1)(\s*stars?|\s*out of 5)/gi, (match, prefix, rating) => {
+          const stars = '⭐'.repeat(parseInt(rating));
+          return `${prefix}${stars}`;
+        })
+        
+        // Add checkmarks for positive points
+        .replace(/(\b)(Yes|Available|Included|Provided|Offered)(\b)/gi, '$1✅ $2$3')
+        
+        // Add warning signs for limitations
+        .replace(/(\b)(No|Not|Limited|Restricted|Expensive|Difficult)(\b)/gi, '$1⚠️ $2$3')
+        
+        // Add money emoji for financial info
+        .replace(/(\b)(₹|Rs\.?|INR|Dollar|USD)(\s*\d+)/gi, '$1💰 $2$3')
+        
+        // Add calendar for dates
+        .replace(/(\b)(January|February|March|April|May|June|July|August|September|October|November|December)(\b)/gi, '$1📅 $2$3')
+        
+        // Add location for places
+        .replace(/(\b)(City|State|Country|Region|Area|Zone)(\b)/gi, '$1📍 $2$3');
+
+      // Add summary section with key highlights
+      const summaryMatch = formattedResponse.match(/(?:Summary|Conclusion|Final Thoughts?):?\s*\n((?:.*?\n)*?)(?=\n|$)/i);
+      if (summaryMatch) {
+        const summary = summaryMatch[1].trim();
+        const highlights = summary.split('\n').filter(line => line.trim()).slice(0, 5);
+        
+        let highlightsSection = '\n\n🎯 **Key Highlights:**\n\n';
+        highlights.forEach((highlight, index) => {
+          highlightsSection += `${index + 1}️⃣ ${highlight.trim()}\n`;
+        });
+        
+        formattedResponse = formattedResponse.replace(summaryMatch[0], summaryMatch[0] + highlightsSection);
+      }
+
+      return formattedResponse;
+    };
+
     return (
       <div className="recommendations-container">
         <div className="recommendations-header">
@@ -395,8 +558,42 @@ const CourseRecommendation = () => {
           </div>
         </div>
         
-        <div className="recommendations-content">
-          {recommendations}
+        <div className="recommendations-content enhanced">
+          <div 
+            className="ai-response-formatted"
+            dangerouslySetInnerHTML={{ 
+              __html: formatAIResponse(recommendations)
+                .split('\n')
+                .map(line => {
+                  // Convert markdown-style headers to HTML
+                  if (line.startsWith('## ')) {
+                    return `<h3 class="ai-section-header">${line.substring(3)}</h3>`;
+                  }
+                  // Convert markdown-style bold to HTML
+                  if (line.includes('**')) {
+                    return line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                  }
+                  // Convert bullet points
+                  if (line.startsWith('• ')) {
+                    return `<div class="ai-bullet-point">${line}</div>`;
+                  }
+                  // Convert numbered points
+                  if (line.match(/^\d+️⃣\s/)) {
+                    return `<div class="ai-numbered-point">${line}</div>`;
+                  }
+                  // Convert tables
+                  if (line.includes('|')) {
+                    return `<div class="ai-table-line">${line}</div>`;
+                  }
+                  // Convert regular text
+                  if (line.trim()) {
+                    return `<p class="ai-text">${line}</p>`;
+                  }
+                  return '<br>';
+                })
+                .join('')
+            }}
+          />
         </div>
 
         <div className="recommendations-footer">

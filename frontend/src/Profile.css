@@ -356,6 +356,70 @@
   color: white;
 }
 
+/* Profile Completion */
+.profile-completion {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.profile-completion .progress {
+  background-color: var(--gray-200);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.profile-completion .progress-bar {
+  background: linear-gradient(135deg, var(--success), #00b894);
+  border-radius: 10px;
+  transition: var(--transition);
+}
+
+.profile-completion small {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
+/* Profile Completion Mini */
+.profile-completion-mini {
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.profile-completion-mini .progress {
+  background-color: var(--gray-200);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.profile-completion-mini .progress-bar {
+  background: linear-gradient(135deg, var(--success), #00b894);
+  border-radius: 8px;
+  transition: var(--transition);
+}
+
+.profile-completion-mini small {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--gray-600);
+}
+
+/* Section Subtitle */
+.section-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.section-subtitle .label-icon {
+  color: var(--primary);
+  font-size: 1rem;
+}
+
 .stat-status {
   display: flex;
   align-items: center;
@@ -490,6 +554,14 @@
   border: 1px solid var(--gray-200);
 }
 
+.edit-profile-form.enhanced .row {
+  margin-bottom: 1rem;
+}
+
+.edit-profile-form.enhanced .row:last-child {
+  margin-bottom: 0;
+}
+
 .form-label {
   font-weight: 600;
   color: var(--dark);
@@ -528,6 +600,99 @@
   min-height: 100px;
 }
 
+/* Edit Form Sections */
+.edit-profile-form.enhanced .skills-grid,
+.edit-profile-form.enhanced .interests-grid,
+.edit-profile-form.enhanced .achievements-grid {
+  background: white;
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--gray-200);
+  min-height: 60px;
+}
+
+.edit-profile-form.enhanced .skill-tag,
+.edit-profile-form.enhanced .interest-tag,
+.edit-profile-form.enhanced .achievement-tag {
+  background: linear-gradient(135deg, var(--primary-light), rgba(114, 9, 183, 0.1));
+  color: var(--primary);
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--transition);
+  border: 1px solid transparent;
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+
+.edit-profile-form.enhanced .skill-tag:hover,
+.edit-profile-form.enhanced .interest-tag:hover,
+.edit-profile-form.enhanced .achievement-tag:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(67, 97, 238, 0.2);
+  border-color: var(--primary);
+}
+
+.edit-profile-form.enhanced .remove-tag-btn {
+  background: none;
+  border: none;
+  color: var(--danger);
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: var(--transition);
+  margin-left: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.edit-profile-form.enhanced .remove-tag-btn:hover {
+  background: var(--danger);
+  color: white;
+  transform: scale(1.1);
+}
+
+.edit-profile-form.enhanced .add-item-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.edit-profile-form.enhanced .add-item-input {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid var(--gray-200);
+  border-radius: var(--border-radius);
+  font-size: 0.9rem;
+  transition: var(--transition);
+}
+
+.edit-profile-form.enhanced .add-item-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.edit-profile-form.enhanced .add-item-form .btn {
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: var(--transition);
+}
+
+.edit-profile-form.enhanced .add-item-form .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
+}
+
 /* Enhanced Info Display */
 .info-display.enhanced {
   padding: 2rem;
@@ -556,6 +721,64 @@
   line-height: 1.6;
   font-size: 1rem;
   margin-bottom: 1.5rem;
+}
+
+/* Info Items */
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: white;
+  border-radius: var(--border-radius);
+  border: 1px solid var(--gray-200);
+  transition: var(--transition);
+}
+
+.info-item:hover {
+  transform: translateX(5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: var(--primary);
+}
+
+.info-icon {
+  color: var(--primary);
+  font-size: 1.1rem;
+  margin-top: 0.1rem;
+  flex-shrink: 0;
+}
+
+.info-item div {
+  flex: 1;
+  color: var(--gray-700);
+  line-height: 1.5;
+}
+
+.info-item strong {
+  color: var(--dark);
+  font-weight: 600;
+}
+
+/* Profile Links */
+.profile-link {
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 500;
+  transition: var(--transition);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  background: var(--primary-light);
+  display: inline-block;
+  margin-left: 0.5rem;
+}
+
+.profile-link:hover {
+  color: var(--primary-dark);
+  background: var(--primary);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-1px);
 }
 
 /* Responsive Design */

@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  bio: {
+    type: String,
+    default: ''
+  },
   skills: [{
     type: String
   }],
@@ -31,6 +35,43 @@ const userSchema = new mongoose.Schema({
   achievements: [{
     type: String
   }],
+  certifications: [{
+    type: String
+  }],
+  educationLevel: {
+    type: String,
+    enum: ['High School', 'Undergraduate', 'Graduate', 'Professional', 'Other', ''],
+    default: ''
+  },
+  phone: {
+    type: String,
+    default: ''
+  },
+  location: {
+    type: String,
+    default: ''
+  },
+  linkedin: {
+    type: String,
+    default: ''
+  },
+  github: {
+    type: String,
+    default: ''
+  },
+  website: {
+    type: String,
+    default: ''
+  },
+  experience: {
+    type: String,
+    enum: ['0-1 years', '1-3 years', '3-5 years', '5-10 years', '10+ years', ''],
+    default: ''
+  },
+  profileImage: {
+    type: String,
+    default: ''
+  },
   profileCompleted: {
     type: Boolean,
     default: false

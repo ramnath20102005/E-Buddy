@@ -16,7 +16,10 @@ import {
   FaLightbulb,
   FaBookOpen,
   FaHeadset,
-  FaUser
+  FaUser,
+  FaShieldAlt,
+  FaClock,
+  FaGlobe
 } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -79,6 +82,12 @@ const Landing = () => {
     { number: "500+", label: "Courses", icon: <FaBookOpen /> }
   ];
 
+  const benefits = [
+    { icon: <FaShieldAlt />, title: "Secure Learning", description: "Your data and progress are protected with enterprise-grade security" },
+    { icon: <FaClock />, title: "Flexible Schedule", description: "Learn at your own pace with 24/7 access to all resources" },
+    { icon: <FaGlobe />, title: "Global Community", description: "Connect with learners from around the world" }
+  ];
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentFeature((prev) => (prev + 1) % features.length);
@@ -96,32 +105,29 @@ const Landing = () => {
       {/* Hero Section */}
       <section 
         className="landing-hero"
-        style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url(${process.env.PUBLIC_URL}/hero-bg.jpg)` }}
+        style={{ backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${process.env.PUBLIC_URL}/hero-bg.jpg)` }}
       >
         <div className="hero-content">
-          <motion.h1
+          <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="hero-title"
+            className="hero-text-content"
           >
-            Transform Your Learning Journey
-            <span className="gradient-text"> with AI</span>
-          </motion.h1>
-          
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="hero-description"
-          >
-            E-Buddy combines AI-powered guidance with personalized learning paths to help you achieve your educational and career goals.
-          </motion.p>
+            <h1 className="hero-title">
+              Transform Your Learning Journey
+              <span className="gradient-text"> with AI</span>
+            </h1>
+            
+            <p className="hero-description">
+              E-Buddy combines AI-powered guidance with personalized learning paths to help you achieve your educational and career goals.
+            </p>
+          </motion.div>
           
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             className="hero-stats"
           >
             {stats.map((stat, index) => (
@@ -129,7 +135,7 @@ const Landing = () => {
                 key={stat.label}
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
+                transition={{ duration: 0.5, delay: 0.4 + index * 0.1 }}
                 className="stat-item"
               >
                 <div className="stat-icon">{stat.icon}</div>
@@ -142,7 +148,7 @@ const Landing = () => {
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
             className="cta-buttons"
           >
             <Link to="/signup" className="cta-button cta-primary">
@@ -189,187 +195,217 @@ const Landing = () => {
         </div>
       </section>
 
-      {/* Features Section */}
-      <section className="features-section">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="section-header"
-        >
-          <h2 className="section-title">Why Choose E-Buddy?</h2>
-          <p className="section-subtitle">Discover the power of AI-driven education</p>
-        </motion.div>
-
-        <div className="features-container">
-          <div className="features-grid">
-            {features.map((feature, index) => (
+      {/* Benefits Section */}
+      <section className="benefits-section">
+        <div className="container">
+          <div className="benefits-grid">
+            {benefits.map((benefit, index) => (
               <motion.div
-                key={feature.title}
+                key={benefit.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
                 viewport={{ once: true }}
-                whileHover={{ scale: 1.05, y: -10 }}
-                className="feature-card"
-                style={{ '--feature-color': feature.color }}
+                className="benefit-card"
               >
-                <div className="feature-icon" style={{ color: feature.color }}>
-                  {feature.icon}
-                </div>
-                <h3>{feature.title}</h3>
-                <p>{feature.description}</p>
-                <ul className="feature-benefits">
-                  {feature.benefits.map((benefit, idx) => (
-                    <li key={idx}>
-                      <FaCheckCircle className="benefit-icon" />
-                      {benefit}
-                    </li>
-                  ))}
-                </ul>
-                <div className="feature-action">
-                  <FaArrowRight className="action-icon" />
-                </div>
+                <div className="benefit-icon">{benefit.icon}</div>
+                <h3>{benefit.title}</h3>
+                <p>{benefit.description}</p>
               </motion.div>
             ))}
           </div>
+        </div>
+      </section>
 
-          {/* Interactive Feature Showcase */}
+      {/* Features Section */}
+      <section className="features-section">
+        <div className="container">
           <motion.div
-            initial={{ opacity: 0, x: 50 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
             viewport={{ once: true }}
-            className="feature-showcase"
+            className="section-header"
           >
-            <div className="showcase-content">
-              <h3>{features[currentFeature].title}</h3>
-              <p>{features[currentFeature].description}</p>
-              <div className="showcase-indicators">
-                {features.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`indicator ${index === currentFeature ? 'active' : ''}`}
-                    onClick={() => setCurrentFeature(index)}
-                  />
-                ))}
-              </div>
-            </div>
+            <h2 className="section-title">Why Choose E-Buddy?</h2>
+            <p className="section-subtitle">Discover the power of AI-driven education</p>
           </motion.div>
+
+          <div className="features-container">
+            <div className="features-grid">
+              {features.map((feature, index) => (
+                <motion.div
+                  key={feature.title}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  viewport={{ once: true }}
+                  whileHover={{ scale: 1.02, y: -5 }}
+                  className="feature-card"
+                  style={{ '--feature-color': feature.color }}
+                >
+                  <div className="feature-icon" style={{ color: feature.color }}>
+                    {feature.icon}
+                  </div>
+                  <h3>{feature.title}</h3>
+                  <p>{feature.description}</p>
+                  <ul className="feature-benefits">
+                    {feature.benefits.map((benefit, idx) => (
+                      <li key={idx}>
+                        <FaCheckCircle className="benefit-icon" />
+                        {benefit}
+                      </li>
+                    ))}
+                  </ul>
+                  <div className="feature-action">
+                    <FaArrowRight className="action-icon" />
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Interactive Feature Showcase */}
+            <motion.div
+              initial={{ opacity: 0, x: 50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="feature-showcase"
+            >
+              <div className="showcase-content">
+                <h3>{features[currentFeature].title}</h3>
+                <p>{features[currentFeature].description}</p>
+                <div className="showcase-indicators">
+                  {features.map((_, index) => (
+                    <button
+                      key={index}
+                      className={`indicator ${index === currentFeature ? 'active' : ''}`}
+                      onClick={() => setCurrentFeature(index)}
+                    />
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
       {/* How It Works Section */}
       <section className="how-it-works-section">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="section-header"
-        >
-          <h2 className="section-title">How E-Buddy Works</h2>
-          <p className="section-subtitle">Your journey to success in 4 simple steps</p>
-        </motion.div>
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="section-header"
+          >
+            <h2 className="section-title">How E-Buddy Works</h2>
+            <p className="section-subtitle">Your journey to success in 4 simple steps</p>
+          </motion.div>
 
-        <div className="steps-container">
-          {[
-            { icon: <FaUser />, title: "Sign Up", description: "Create your account and tell us about your goals" },
-            { icon: <FaLightbulb />, title: "Get Assessed", description: "Our AI analyzes your skills and interests" },
-            { icon: <FaBookOpen />, title: "Learn", description: "Access personalized courses and materials" },
-            { icon: <FaAward />, title: "Succeed", description: "Track progress and achieve your goals" }
-          ].map((step, index) => (
-            <motion.div
-              key={step.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              viewport={{ once: true }}
-              className="step-item"
-            >
-              <div className="step-number">{index + 1}</div>
-              <div className="step-icon">{step.icon}</div>
-              <h3>{step.title}</h3>
-              <p>{step.description}</p>
-            </motion.div>
-          ))}
+          <div className="steps-container">
+            {[
+              { icon: <FaUser />, title: "Sign Up", description: "Create your account and tell us about your goals" },
+              { icon: <FaLightbulb />, title: "Get Assessed", description: "Our AI analyzes your skills and interests" },
+              { icon: <FaBookOpen />, title: "Learn", description: "Access personalized courses and materials" },
+              { icon: <FaAward />, title: "Succeed", description: "Track progress and achieve your goals" }
+            ].map((step, index) => (
+              <motion.div
+                key={step.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+                viewport={{ once: true }}
+                className="step-item"
+              >
+                <div className="step-number">{index + 1}</div>
+                <div className="step-icon">{step.icon}</div>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Testimonials Section */}
       <section className="testimonials-section">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="section-header"
-        >
-          <h2 className="section-title">What Our Users Say</h2>
-          <p className="section-subtitle">Join thousands of satisfied learners</p>
-        </motion.div>
+        <div className="container">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="section-header"
+          >
+            <h2 className="section-title">What Our Users Say</h2>
+            <p className="section-subtitle">Join thousands of satisfied learners</p>
+          </motion.div>
 
-        <div className="testimonials-grid">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={testimonial.author}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -10 }}
-              className="testimonial-card"
-            >
-              <div className="testimonial-header">
-                <div className="testimonial-avatar">{testimonial.avatar}</div>
-                <div className="testimonial-rating">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <FaStar key={i} className="star-icon" />
-                  ))}
+          <div className="testimonials-grid">
+            {testimonials.map((testimonial, index) => (
+              <motion.div
+                key={testimonial.author}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+                viewport={{ once: true }}
+                whileHover={{ y: -5 }}
+                className="testimonial-card"
+              >
+                <div className="testimonial-header">
+                  <div className="testimonial-avatar">{testimonial.avatar}</div>
+                  <div className="testimonial-rating">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <FaStar key={i} className="star-icon" />
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <FaQuoteLeft className="quote-icon" />
-              <p className="testimonial-text">{testimonial.text}</p>
-              <div className="testimonial-author">
-                <strong>{testimonial.author}</strong>
-                <span>{testimonial.role}</span>
-              </div>
-            </motion.div>
-          ))}
+                <FaQuoteLeft className="quote-icon" />
+                <p className="testimonial-text">{testimonial.text}</p>
+                <div className="testimonial-author">
+                  <strong>{testimonial.author}</strong>
+                  <span>{testimonial.role}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* Final CTA Section */}
       <section className="final-cta-section">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8 }}
-          viewport={{ once: true }}
-          className="cta-content"
-        >
-          <h2 className="cta-title">Ready to Begin Your Journey?</h2>
-          <p className="cta-description">
-            Join thousands of learners who have already transformed their careers with E-Buddy
-          </p>
+        <div className="container">
           <motion.div
-            initial={{ scale: 0.95 }}
-            animate={{ scale: 1 }}
-            transition={{ 
-              duration: 1.5,
-              repeat: Infinity,
-              repeatType: "reverse"
-            }}
-            className="cta-button-wrapper"
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="cta-content"
           >
-            <Link to="/signup" className="cta-button cta-primary large">
-              <FaRocket className="btn-icon" />
-              Start Learning for Free
-            </Link>
+            <h2 className="cta-title">Ready to Begin Your Journey?</h2>
+            <p className="cta-description">
+              Join thousands of learners who have already transformed their careers with E-Buddy
+            </p>
+            <motion.div
+              initial={{ scale: 0.95 }}
+              animate={{ scale: 1 }}
+              transition={{ 
+                duration: 1.5,
+                repeat: Infinity,
+                repeatType: "reverse"
+              }}
+              className="cta-button-wrapper"
+            >
+              <Link to="/signup" className="cta-button cta-primary large">
+                <FaRocket className="btn-icon" />
+                Start Learning for Free
+              </Link>
+            </motion.div>
+            <p className="cta-note">No credit card required • Start immediately</p>
           </motion.div>
-          <p className="cta-note">No credit card required • Start immediately</p>
-        </motion.div>
+        </div>
       </section>
 
       {/* Video Modal */}
