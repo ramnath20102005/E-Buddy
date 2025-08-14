@@ -2,7 +2,24 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { PDFDownloadLink, Document, Page, Text, StyleSheet } from '@react-pdf/renderer';
-import '../study-material.css';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  FaBookOpen, 
+  FaLightbulb, 
+  FaDownload, 
+  FaShare, 
+  FaPlay,
+  FaGraduationCap,
+  FaRocket,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaClock,
+  FaCrosshairs,
+  FaQuestionCircle,
+  FaList,
+  FaFileAlt
+} from 'react-icons/fa';
+import '../styles/learning-common.css';
 import Chatbot from "../components/Chatbot";
 
 // Define PdfDocument outside StudyMaterials to avoid redefinition issues
@@ -118,120 +135,236 @@ const StudyMaterials = () => {
   };
 
   return (
-    <div className="study-material-container">
-      <div className="study-material-wrapper">
-        <div className="left-section">
-          <h2>Study Material Generator</h2>
-          <form onSubmit={generateMaterial} className="study-material-form">
-            <input
-              type="text"
-              value={topic}
-              onChange={(e) => { setTopic(e.target.value); setError(''); }}
-              placeholder="Enter topic (e.g., Quantum Physics)"
-              required
-              disabled={isLoading}
-            />
-            
-            <select
-              value={materialType}
-              onChange={(e) => setMaterialType(e.target.value)}
-              disabled={isLoading}
-            >
-              <option value="summarize">Summarized Notes</option>
-              <option value="flashcards">Flashcards</option>
-              <option value="quiz">MCQs and Answers</option>
-            </select>
-
-            {materialType === 'summarize' && (
-              <input
-                type="number"
-                name="bullets"
-                min="1"
-                max="20"
-                value={additionalOptions.bullets}
-                onChange={handleOptionChange}
-                disabled={isLoading}
-                placeholder="Number of bullet points"
-              />
-            )}
-
-            {materialType === 'flashcards' && (
-              <input
-                type="number"
-                name="count"
-                min="1"
-                max="20"
-                value={additionalOptions.count}
-                onChange={handleOptionChange}
-                disabled={isLoading}
-                placeholder="Number of flashcards"
-              />
-            )}
-
-            {materialType === 'quiz' && (
-              <input
-                type="number"
-                name="questions"
-                min="1"
-                max="20"
-                value={additionalOptions.questions}
-                onChange={handleOptionChange}
-                disabled={isLoading}
-                placeholder="Number of questions"
-              />
-            )}
-
-            <button type="submit" disabled={isLoading}>
-              {isLoading ? 'Generating...' : 'Generate Material'}
-            </button>
-          </form>
-          {error && <div className="error-message">{error}</div>}
+    <div className="learning-page-container">
+      <div className="learning-page-wrapper">
+        {/* Header Section */}
+        <div className="learning-header">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <FaBookOpen style={{ marginRight: '20px', fontSize: '3rem' }} />
+            Study Material Generator
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Create comprehensive study materials with AI-powered assistance
+          </motion.p>
         </div>
 
-        <div className="right-section">
-          <div className="response-content">
-            {isLoading ? (
-              <div className="loading-container">
-                <div className="spinner"></div>
-                <p>Generating your study material...</p>
+        {/* Content Section */}
+        <div className="learning-content">
+          <div className="learning-sidebar">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '20px', color: 'var(--gray-800)' }}>
+                <FaLightbulb style={{ marginRight: '10px', color: 'var(--primary-blue)' }} />
+                Generate Materials
+              </h2>
+                      <form onSubmit={generateMaterial} className="learning-form">
+              <div className="form-group">
+                <label>What topic do you want to study?</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  value={topic}
+                  onChange={(e) => { setTopic(e.target.value); setError(''); }}
+                  placeholder="e.g., Quantum Physics, Machine Learning, Web Development"
+                  required
+                  disabled={isLoading}
+                />
               </div>
-            ) : response ? (
-              <div className="response-box">
-                <h3>
-                  Generated {materialType === 'quiz' ? 'Quiz' : 
-                           materialType === 'flashcards' ? 'Flashcards' : 'Summary'}:
-                </h3>
-                <pre className="animated-text" style={{ whiteSpace: 'pre-wrap' }}>
-                  {animatedResponse}
-                </pre>
-                <div style={{ marginTop: '20px' }}>
-                  <PDFDownloadLink
-                    document={<PdfDocument response={response} materialType={materialType} topic={topic} />}
-                    fileName={`${topic}-${materialType}.pdf`}
-                  >
-                    {({ loading: pdfLoading }) => (
-                      <button 
-                        style={{
-                          backgroundColor: '#2196F3',
-                          color: 'white',
-                          padding: '10px 15px',
-                          border: 'none',
-                          borderRadius: '4px',
-                          cursor: 'pointer'
-                        }}
-                        disabled={pdfLoading || isLoading}
-                      >
-                        {pdfLoading ? 'Creating PDF...' : '📥 Download as PDF'}
-                      </button>
-                    )}
-                  </PDFDownloadLink>
+              
+              <div className="form-group">
+                <label>Type of Material</label>
+                <select
+                  className="form-select"
+                  value={materialType}
+                  onChange={(e) => setMaterialType(e.target.value)}
+                  disabled={isLoading}
+                >
+                  <option value="summarize">📝 Summarized Notes</option>
+                  <option value="flashcards">🃏 Flashcards</option>
+                  <option value="quiz">❓ MCQs and Answers</option>
+                </select>
+              </div>
+
+              {materialType === 'summarize' && (
+                <div className="form-group">
+                  <label>Number of Bullet Points</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    name="bullets"
+                    min="1"
+                    max="20"
+                    value={additionalOptions.bullets}
+                    onChange={handleOptionChange}
+                    disabled={isLoading}
+                    placeholder="How many key points?"
+                  />
                 </div>
-              </div>
-            ) : (
-              <div className="placeholder-text">
-                Your study material will appear here
-              </div>
+              )}
+
+              {materialType === 'flashcards' && (
+                <div className="form-group">
+                  <label>Number of Flashcards</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    name="count"
+                    min="1"
+                    max="20"
+                    value={additionalOptions.count}
+                    onChange={handleOptionChange}
+                    disabled={isLoading}
+                    placeholder="How many cards?"
+                  />
+                </div>
+              )}
+
+              {materialType === 'quiz' && (
+                <div className="form-group">
+                  <label>Number of Questions</label>
+                  <input
+                    type="number"
+                    className="form-input"
+                    name="questions"
+                    min="1"
+                    max="20"
+                    value={additionalOptions.questions}
+                    onChange={handleOptionChange}
+                    disabled={isLoading}
+                    placeholder="How many questions?"
+                  />
+                </div>
+              )}
+
+              <motion.button
+                type="submit"
+                className="btn btn-primary"
+                disabled={isLoading}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                style={{ marginTop: '20px' }}
+              >
+                {isLoading ? (
+                  <>
+                    <div className="spinner" style={{ width: '20px', height: '20px', margin: '0' }}></div>
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <FaRocket style={{ marginRight: '8px' }} />
+                    Generate Material
+                  </>
+                )}
+              </motion.button>
+            </form>
+            
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="card"
+                style={{ 
+                  marginTop: '20px', 
+                  background: 'rgba(239, 68, 68, 0.1)', 
+                  border: '1px solid var(--accent-red)',
+                  color: 'var(--accent-red)'
+                }}
+              >
+                <FaExclamationTriangle style={{ marginRight: '8px' }} />
+                {error}
+              </motion.div>
             )}
+            </motion.div>
+          </div>
+
+          <div className="learning-main">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <div className="response-content">
+                {isLoading ? (
+                  <div className="loading-container">
+                    <div className="spinner"></div>
+                    <div className="loading-text">Generating your study material...</div>
+                  </div>
+                ) : response ? (
+                  <div className="response-box">
+                    <div className="response-title">
+                      <FaLightbulb style={{ marginRight: '10px', color: 'var(--accent-orange)' }} />
+                      Generated {materialType === 'quiz' ? 'Quiz' : 
+                               materialType === 'flashcards' ? 'Flashcards' : 'Summary'}
+                    </div>
+                    <div className="response-text">
+                      {animatedResponse}
+                    </div>
+                    
+                    {/* Action Buttons */}
+                    <div style={{ 
+                      display: 'flex', 
+                      gap: '12px', 
+                      marginTop: '24px', 
+                      flexWrap: 'wrap' 
+                    }}>
+                      <motion.button
+                        className="btn btn-success"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <FaPlay style={{ marginRight: '8px' }} />
+                        Start Studying
+                      </motion.button>
+                      
+                      <PDFDownloadLink
+                        document={<PdfDocument response={response} materialType={materialType} topic={topic} />}
+                        fileName={`${topic}-${materialType}.pdf`}
+                      >
+                        {({ loading: pdfLoading }) => (
+                          <motion.button
+                            className="btn btn-outline"
+                            disabled={pdfLoading || isLoading}
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            <FaDownload style={{ marginRight: '8px' }} />
+                            {pdfLoading ? 'Creating PDF...' : 'Download PDF'}
+                          </motion.button>
+                        )}
+                      </PDFDownloadLink>
+                      
+                      <motion.button
+                        className="btn btn-outline"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <FaShare style={{ marginRight: '8px' }} />
+                        Share
+                      </motion.button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="placeholder-container">
+                    <div className="placeholder-icon">📚</div>
+                    <div className="placeholder-text">Ready to generate study materials?</div>
+                    <div className="placeholder-subtext">
+                      Fill out the form on the left to get started
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>

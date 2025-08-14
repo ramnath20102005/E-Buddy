@@ -1,7 +1,24 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
-import '../QuizPage.css';
+import { 
+  FaQuestionCircle, 
+  FaClock, 
+  FaCheckCircle, 
+  FaTimesCircle,
+  FaTrophy,
+  FaRocket,
+  FaArrowLeft,
+  FaArrowRight,
+  FaPlay,
+  FaGraduationCap,
+  FaLightbulb,
+  FaCrosshairs,
+  FaChartLine,
+  FaExclamationTriangle
+} from 'react-icons/fa';
+import '../styles/learning-common.css';
+import Chatbot from "../components/Chatbot";
 
 const QuizPage = () => {
   const [topic, setTopic] = useState("");
@@ -154,183 +171,388 @@ const QuizPage = () => {
   };
 
   return (
-    <motion.div 
-      className="quiz-container"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
-      <h2>Quiz Generator</h2>
+    <div className="learning-page-container">
+      <div className="learning-page-wrapper">
+        {/* Header Section */}
+        <div className="learning-header">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <FaQuestionCircle style={{ marginRight: '20px', fontSize: '3rem' }} />
+            Quiz Generator
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Test your knowledge with AI-generated quizzes
+          </motion.p>
+        </div>
+
+        {/* Content Section */}
+        <div className="learning-content">
+          <div className="learning-sidebar">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+            >
+              <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '20px', color: 'var(--gray-800)' }}>
+                <FaCrosshairs style={{ marginRight: '10px', color: 'var(--primary-blue)' }} />
+                Quiz Setup
+              </h2>
       
-      {/* Quiz Setup */}
-      {questions.length === 0 && (
-        <motion.div 
-          className="quiz-controls"
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <input
-            type="text"
-            placeholder="Enter quiz topic"
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            className="quiz-input"
-          />
-          <select
-            value={numberOfQuestions}
-            onChange={(e) => setNumberOfQuestions(Number(e.target.value))}
-            className="quiz-input"
-            style={{ marginRight: '10px' }}
-          >
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
-              <option key={num} value={num}>
-                {num} Questions
-              </option>
-            ))}
-          </select>
-          <button 
-            onClick={fetchQuestions} 
-            disabled={loading}
-            className="quiz-button"
-          >
-            {loading ? "Generating..." : "Generate Quiz"}
-          </button>
-        </motion.div>
-      )}
+                    <div className="learning-form">
+                <div className="form-group">
+                  <label>What topic do you want to quiz on?</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    placeholder="e.g., Machine Learning, Web Development, History"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                  />
+                </div>
 
-      {error && <div className="quiz-error">{error}</div>}
+                <div className="form-group">
+                  <label>Number of Questions</label>
+                  <select
+                    className="form-select"
+                    value={numberOfQuestions}
+                    onChange={(e) => setNumberOfQuestions(Number(e.target.value))}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+                      <option key={num} value={num}>
+                        {num} Questions
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-      {/* Questions Display */}
-      {questions.length > 0 && score === null && (
+                <motion.button 
+                  onClick={fetchQuestions} 
+                  disabled={loading}
+                  className="btn btn-primary"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  style={{ marginTop: '20px' }}
+                >
+                  {loading ? (
+                    <>
+                      <div className="spinner" style={{ width: '20px', height: '20px', margin: '0' }}></div>
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <FaRocket style={{ marginRight: '8px' }} />
+                      Generate Quiz
+                    </>
+                  )}
+                </motion.button>
+              </div>
+            </motion.div>
+          </div>
+
+          <div className="learning-main">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+
+                    {questions.length === 0 && (
+                <div className="placeholder-container">
+                  <div className="placeholder-icon">❓</div>
+                  <div className="placeholder-text">Ready to test your knowledge?</div>
+                  <div className="placeholder-subtext">
+                    Fill out the form on the left to generate a quiz
+                  </div>
+                </div>
+              )}
+
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="card"
+                  style={{ 
+                    background: 'rgba(239, 68, 68, 0.1)', 
+                    border: '1px solid var(--accent-red)',
+                    color: 'var(--accent-red)'
+                  }}
+                >
+                  <FaExclamationTriangle style={{ marginRight: '8px' }} />
+                  {error}
+                </motion.div>
+              )}
+
+              {/* Questions Display */}
+              {questions.length > 0 && score === null && (
         <motion.div 
           className="quiz-active"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          {/* Timer */}
-          <div className="quiz-timer">
-            Time Remaining: {formatTime(timeRemaining)}
-          </div>
+                <div className="card" style={{ marginBottom: '24px' }}>
+                  {/* Timer */}
+                  <div style={{ 
+                    display: 'flex', 
+                    alignItems: 'center', 
+                    justifyContent: 'space-between',
+                    marginBottom: '20px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <FaClock style={{ color: 'var(--accent-orange)' }} />
+                      <span style={{ fontWeight: '600' }}>Time Remaining:</span>
+                    </div>
+                    <div style={{ 
+                      fontSize: '1.5rem', 
+                      fontWeight: '800', 
+                      color: 'var(--accent-orange)',
+                      fontFamily: 'monospace'
+                    }}>
+                      {formatTime(timeRemaining)}
+                    </div>
+                  </div>
 
-          {/* Question Navigation */}
-          <div className="question-navigation">
-            {questions.map((_, index) => (
-              <div 
-                key={index} 
-                className={`nav-dot ${currentQuestion === index ? 'active' : userAnswers[index] ? 'answered' : ''}`}
-                onClick={() => setCurrentQuestion(index)}
-              />
-            ))}
-          </div>
+                  {/* Question Navigation */}
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
+                    {questions.map((_, index) => (
+                      <motion.div 
+                        key={index} 
+                        style={{
+                          width: '12px',
+                          height: '12px',
+                          borderRadius: '50%',
+                          background: currentQuestion === index 
+                            ? 'var(--primary-blue)' 
+                            : userAnswers[index] 
+                              ? 'var(--accent-green)' 
+                              : 'var(--gray-300)',
+                          cursor: 'pointer',
+                          transition: 'all 0.3s ease'
+                        }}
+                        onClick={() => setCurrentQuestion(index)}
+                        whileHover={{ scale: 1.2 }}
+                        whileTap={{ scale: 0.9 }}
+                      />
+                    ))}
+                  </div>
+                </div>
 
-          {/* Current Question */}
-          <AnimatePresence mode="wait">
-            <motion.div 
-              key={currentQuestion}
-              className="question-card"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ duration: 0.3 }}
-            >
-              <h3>Question {currentQuestion + 1}: {questions[currentQuestion].question}</h3>
-              <div className="options-container">
-                {questions[currentQuestion].options.map((option, i) => (
-                  <motion.button 
-                    key={i} 
-                    onClick={() => handleAnswer(currentQuestion, option)}
-                    className={`option-button ${
-                      userAnswers[currentQuestion] === option ? "selected" : ""
-                    }`}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
+                {/* Current Question */}
+                <AnimatePresence mode="wait">
+                  <motion.div 
+                    key={currentQuestion}
+                    className="card"
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -50 }}
+                    transition={{ duration: 0.3 }}
                   >
-                    {option}
-                  </motion.button>
-                ))}
-              </div>
-            </motion.div>
-          </AnimatePresence>
+                    <div className="card-header">
+                      <div className="card-title">
+                        Question {currentQuestion + 1} of {questions.length}
+                      </div>
+                      <div className="badge badge-info">
+                        {userAnswers[currentQuestion] ? 'Answered' : 'Unanswered'}
+                      </div>
+                    </div>
+                    
+                    <div style={{ marginBottom: '24px' }}>
+                      <h3 style={{ 
+                        fontSize: '1.25rem', 
+                        fontWeight: '600', 
+                        color: 'var(--gray-800)',
+                        lineHeight: '1.6',
+                        marginBottom: '20px'
+                      }}>
+                        {questions[currentQuestion].question}
+                      </h3>
+                      
+                      <div style={{ display: 'grid', gap: '12px' }}>
+                        {questions[currentQuestion].options.map((option, i) => (
+                          <motion.button 
+                            key={i} 
+                            onClick={() => handleAnswer(currentQuestion, option)}
+                            style={{
+                              padding: '16px',
+                              border: `2px solid ${userAnswers[currentQuestion] === option ? 'var(--primary-blue)' : 'var(--gray-200)'}`,
+                              borderRadius: 'var(--radius-lg)',
+                              background: userAnswers[currentQuestion] === option ? 'rgba(37, 99, 235, 0.05)' : 'var(--white)',
+                              color: 'var(--gray-800)',
+                              textAlign: 'left',
+                              cursor: 'pointer',
+                              transition: 'all 0.3s ease',
+                              fontSize: '1rem',
+                              lineHeight: '1.5'
+                            }}
+                            whileHover={{ 
+                              scale: 1.02, 
+                              borderColor: 'var(--primary-blue)',
+                              background: 'rgba(37, 99, 235, 0.05)'
+                            }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            {option}
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
 
           {/* Quiz Control Buttons */}
           <div className="quiz-controls">
-            <button 
-              onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
-              disabled={currentQuestion === 0}
-              className="nav-button"
-            >
-              Previous
-            </button>
-            <button 
+                  <motion.button 
+                    onClick={() => setCurrentQuestion(Math.max(0, currentQuestion - 1))}
+                    disabled={currentQuestion === 0}
+                    className="btn btn-outline"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <FaArrowLeft style={{ marginRight: '8px' }} />
+                    Previous
+                  </motion.button>
+            <motion.button 
               onClick={() => setCurrentQuestion(Math.min(questions.length - 1, currentQuestion + 1))}
               disabled={currentQuestion === questions.length - 1}
-              className="nav-button"
+              className="btn btn-outline"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               Next
-            </button>
-            <button 
-              onClick={submitQuiz} 
-              disabled={loading || Object.keys(userAnswers).length !== questions.length}
-              className="submit-button"
-            >
-              {loading ? "Submitting..." : "Submit Quiz"}
-            </button>
+              <FaArrowRight style={{ marginLeft: '8px' }} />
+            </motion.button>
+                  <motion.button 
+                    onClick={submitQuiz} 
+                    disabled={loading || Object.keys(userAnswers).length !== questions.length}
+                    className="btn btn-success"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {loading ? (
+                      <>
+                        <div className="spinner" style={{ width: '20px', height: '20px', margin: '0' }}></div>
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <FaCheckCircle style={{ marginRight: '8px' }} />
+                        Submit Quiz
+                      </>
+                    )}
+                  </motion.button>
           </div>
         </motion.div>
       )}
 
-      {/* Score Display */}
-      {score !== null && (
-        <motion.div 
-          className="score-container"
-          initial={{ scale: 0.5, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ 
-            type: "spring", 
-            stiffness: 260, 
-            damping: 20 
-          }}
-        >
-          <h3>Quiz Performance</h3>
-          <div className="score-details">
-            <p>
-              <span style={{display: 'block', fontSize: '2rem', color: '#2ecc71'}}>
-                {score}
-              </span>
-              Correct Answers
-            </p>
-            <p>
-              <span style={{display: 'block', fontSize: '2rem', color: '#d32f2f'}}>
-                {questions.length - score}
-              </span>
-              Incorrect Answers
-            </p>
-            <p>
-              <span style={{display: 'block', fontSize: '2rem', color: '#4a6fa5'}}>
-                {((score / questions.length) * 100).toFixed(1)}%
-              </span>
-              Total Score
-            </p>
+                    {/* Score Display */}
+              {score !== null && (
+                <motion.div 
+                  className="card"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ 
+                    type: "spring", 
+                    stiffness: 260, 
+                    damping: 20 
+                  }}
+                  style={{ textAlign: 'center' }}
+                >
+                  <div className="card-header" style={{ justifyContent: 'center' }}>
+                    <div className="card-title">
+                      <FaTrophy style={{ marginRight: '10px', color: 'var(--accent-orange)' }} />
+                      Quiz Performance
+                    </div>
+                  </div>
+                  
+                  <div style={{ 
+                    display: 'grid', 
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', 
+                    gap: '24px',
+                    marginBottom: '32px'
+                  }}>
+                    <div>
+                      <div style={{ 
+                        fontSize: '3rem', 
+                        fontWeight: '800', 
+                        color: 'var(--accent-green)',
+                        marginBottom: '8px'
+                      }}>
+                        {score}
+                      </div>
+                      <div style={{ color: 'var(--gray-600)', fontWeight: '500' }}>
+                        Correct Answers
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div style={{ 
+                        fontSize: '3rem', 
+                        fontWeight: '800', 
+                        color: 'var(--accent-red)',
+                        marginBottom: '8px'
+                      }}>
+                        {questions.length - score}
+                      </div>
+                      <div style={{ color: 'var(--gray-600)', fontWeight: '500' }}>
+                        Incorrect Answers
+                      </div>
+                    </div>
+                    
+                    <div>
+                      <div style={{ 
+                        fontSize: '3rem', 
+                        fontWeight: '800', 
+                        color: 'var(--primary-blue)',
+                        marginBottom: '8px'
+                      }}>
+                        {((score / questions.length) * 100).toFixed(1)}%
+                      </div>
+                      <div style={{ color: 'var(--gray-600)', fontWeight: '500' }}>
+                        Total Score
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div style={{ 
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    gap: '16px',
+                    flexWrap: 'wrap'
+                  }}>
+                    <motion.button 
+                      onClick={() => navigate('/learning-path')} 
+                      className="btn btn-outline"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <FaArrowLeft style={{ marginRight: '8px' }} />
+                      Back to Learning Path
+                    </motion.button>
+                    
+                    <motion.button 
+                      onClick={resetQuiz} 
+                      className="btn btn-primary"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <FaRocket style={{ marginRight: '8px' }} />
+                      Retake Quiz
+                    </motion.button>
+                  </div>
+                </motion.div>
+              )}
+            </motion.div>
           </div>
-          <div style={{display: 'flex', justifyContent: 'center', gap: '1rem'}}>
-            <button 
-              onClick={() => navigate('/learning-path')} 
-              className="quiz-button"
-            >
-              Back to Learning Path
-            </button>
-            <button 
-              onClick={resetQuiz} 
-              className="quiz-button"
-              style={{background: '#4a3075'}} // Secondary color
-            >
-              Retake Quiz
-            </button>
-          </div>
-        </motion.div>
-      )}
-    </motion.div>
+        </div>
+      </div>
+      <Chatbot />
+    </div>
   );
 };
 

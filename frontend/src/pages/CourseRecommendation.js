@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import './CourseRecommendation.css';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FaGraduationCap, 
   FaMapMarkerAlt, 
@@ -16,8 +16,17 @@ import {
   FaLightbulb,
   FaCheckCircle,
   FaArrowRight,
-  FaHeart
+  FaHeart,
+  FaRocket,
+  FaExclamationTriangle,
+  FaCrosshairs,
+  FaPlay,
+  FaDownload,
+  FaShare,
+  FaArrowLeft
 } from 'react-icons/fa';
+import '../styles/learning-common.css';
+import Chatbot from "../components/Chatbot";
 
 const CourseRecommendation = () => {
   const [formData, setFormData] = useState({
@@ -94,15 +103,28 @@ const CourseRecommendation = () => {
   };
 
   const renderStepIndicator = () => (
-    <div className="step-indicator">
+    <div className="progress-steps">
       {[1, 2, 3, 4].map((step) => (
-        <div key={step} className={`step ${currentStep >= step ? 'active' : ''}`}>
-          <div className="step-number">{step}</div>
-          <div className="step-label">
-            {step === 1 && 'Basic Info'}
-            {step === 2 && 'Academic'}
-            {step === 3 && 'Preferences'}
-            {step === 4 && 'Review'}
+        <div key={step} className={`step-item ${currentStep >= step ? 'active' : ''} ${currentStep === step ? 'current' : ''}`}>
+          <div className="step-icon">
+            {step === 1 && <FaUser />}
+            {step === 2 && <FaChartLine />}
+            {step === 3 && <FaClock />}
+            {step === 4 && <FaCheckCircle />}
+          </div>
+          <div className="step-content">
+            <div className="step-title">
+              {step === 1 && 'Basic Info'}
+              {step === 2 && 'Academic'}
+              {step === 3 && 'Preferences'}
+              {step === 4 && 'Review'}
+            </div>
+            <div className="step-description">
+              {step === 1 && 'Personal details'}
+              {step === 2 && 'Academic background'}
+              {step === 3 && 'Course preferences'}
+              {step === 4 && 'Final review'}
+            </div>
           </div>
         </div>
       ))}
@@ -123,56 +145,47 @@ const CourseRecommendation = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="name">Full Name *</label>
-                <div className="input-wrapper">
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="Enter your full name"
-                    className="enhanced-input"
-                  />
-                  <FaUser className="input-icon" />
-                </div>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  required
+                  placeholder="Enter your full name"
+                  className="form-input"
+                />
               </div>
               
               <div className="form-group">
                 <label htmlFor="age">Age *</label>
-                <div className="input-wrapper">
-                  <input
-                    type="number"
-                    id="age"
-                    name="age"
-                    value={formData.age}
-                    onChange={handleInputChange}
-                    required
-                    min="16"
-                    max="25"
-                    placeholder="Your age"
-                    className="enhanced-input"
-                  />
-                  <FaCalendarAlt className="input-icon" />
-                </div>
+                <input
+                  type="number"
+                  id="age"
+                  name="age"
+                  value={formData.age}
+                  onChange={handleInputChange}
+                  required
+                  min="16"
+                  max="25"
+                  placeholder="Your age"
+                  className="form-input"
+                />
               </div>
             </div>
 
-            <div className="form-group full-width">
+            <div className="form-group">
               <label htmlFor="region">Preferred Region *</label>
-              <div className="input-wrapper">
-                <input
-                  type="text"
-                  id="region"
-                  name="region"
-                  value={formData.region}
-                  onChange={handleInputChange}
-                  required
-                  placeholder="e.g., Delhi, Mumbai, Bangalore, etc."
-                  className="enhanced-input"
-                />
-                <FaGlobe className="input-icon" />
-              </div>
+              <input
+                type="text"
+                id="region"
+                name="region"
+                value={formData.region}
+                onChange={handleInputChange}
+                required
+                placeholder="e.g., Delhi, Mumbai, Bangalore, etc."
+                className="form-input"
+              />
             </div>
           </div>
         );
@@ -189,59 +202,50 @@ const CourseRecommendation = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="marks">12th Marks (%) *</label>
-                <div className="input-wrapper">
-                  <input
-                    type="number"
-                    id="marks"
-                    name="marks"
-                    value={formData.marks}
-                    onChange={handleInputChange}
-                    required
-                    min="0"
-                    max="100"
-                    step="0.01"
-                    placeholder="Your 12th percentage"
-                    className="enhanced-input"
-                  />
-                  <FaStar className="input-icon" />
-                </div>
+                <input
+                  type="number"
+                  id="marks"
+                  name="marks"
+                  value={formData.marks}
+                  onChange={handleInputChange}
+                  required
+                  min="0"
+                  max="100"
+                  step="0.01"
+                  placeholder="Your 12th percentage"
+                  className="form-input"
+                />
               </div>
               
               <div className="form-group">
                 <label htmlFor="cutoff">Expected Cutoff</label>
-                <div className="input-wrapper">
-                  <input
-                    type="number"
-                    id="cutoff"
-                    name="cutoff"
-                    value={formData.cutoff}
-                    onChange={handleInputChange}
-                    min="0"
-                    max="200"
-                    step="0.01"
-                    placeholder="Expected cutoff percentage"
-                    className="enhanced-input"
-                  />
-                  <FaChartLine className="input-icon" />
-                </div>
+                <input
+                  type="number"
+                  id="cutoff"
+                  name="cutoff"
+                  value={formData.cutoff}
+                  onChange={handleInputChange}
+                  min="0"
+                  max="200"
+                  step="0.01"
+                  placeholder="Expected cutoff percentage"
+                  className="form-input"
+                />
               </div>
             </div>
 
-            <div className="form-group full-width">
+            <div className="form-group">
               <label htmlFor="interests">Areas of Interest *</label>
-              <div className="input-wrapper">
-                <textarea
-                  id="interests"
-                  name="interests"
-                  value={formData.interests}
-                  onChange={handleInputChange}
-                  required
-                  rows="4"
-                  placeholder="Describe your interests, subjects you enjoy, career goals, etc."
-                  className="enhanced-textarea"
-                />
-                <FaLightbulb className="input-icon textarea-icon" />
-              </div>
+              <textarea
+                id="interests"
+                name="interests"
+                value={formData.interests}
+                onChange={handleInputChange}
+                required
+                rows="4"
+                placeholder="Describe your interests, subjects you enjoy, career goals, etc."
+                className="form-input"
+              />
             </div>
           </div>
         );
@@ -258,60 +262,51 @@ const CourseRecommendation = () => {
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="preferredDuration">Preferred Course Duration</label>
-                <div className="input-wrapper">
-                  <select
-                    id="preferredDuration"
-                    name="preferredDuration"
-                    value={formData.preferredDuration}
-                    onChange={handleInputChange}
-                    className="enhanced-select"
-                  >
-                    <option value="">Select duration</option>
-                    <option value="3 years">3 Years (Bachelor's)</option>
-                    <option value="4 years">4 Years (Engineering)</option>
-                    <option value="5 years">5 Years (Integrated)</option>
-                    <option value="2 years">2 Years (Diploma)</option>
-                  </select>
-                  <FaClock className="input-icon" />
-                </div>
+                <select
+                  id="preferredDuration"
+                  name="preferredDuration"
+                  value={formData.preferredDuration}
+                  onChange={handleInputChange}
+                  className="form-select"
+                >
+                  <option value="">Select duration</option>
+                  <option value="3 years">3 Years (Bachelor's)</option>
+                  <option value="4 years">4 Years (Engineering)</option>
+                  <option value="5 years">5 Years (Integrated)</option>
+                  <option value="2 years">2 Years (Diploma)</option>
+                </select>
               </div>
               
               <div className="form-group">
                 <label htmlFor="budget">Budget Range (per year)</label>
-                <div className="input-wrapper">
-                  <select
-                    id="budget"
-                    name="budget"
-                    value={formData.budget}
-                    onChange={handleInputChange}
-                    className="enhanced-select"
-                  >
-                    <option value="">Select budget range</option>
-                    <option value="Under 50,000">Under ₹50,000</option>
-                    <option value="50,000 - 1,00,000">₹50,000 - ₹1,00,000</option>
-                    <option value="1,00,000 - 2,00,000">₹1,00,000 - ₹2,00,000</option>
-                    <option value="2,00,000 - 5,00,000">₹2,00,000 - ₹5,00,000</option>
-                    <option value="Above 5,00,000">Above ₹5,00,000</option>
-                  </select>
-                  <FaMoneyBillWave className="input-icon" />
-                </div>
+                <select
+                  id="budget"
+                  name="budget"
+                  value={formData.budget}
+                  onChange={handleInputChange}
+                  className="form-select"
+                >
+                  <option value="">Select budget range</option>
+                  <option value="Under 50,000">Under ₹50,000</option>
+                  <option value="50,000 - 1,00,000">₹50,000 - ₹1,00,000</option>
+                  <option value="1,00,000 - 2,00,000">₹1,00,000 - ₹2,00,000</option>
+                  <option value="2,00,000 - 5,00,000">₹2,00,000 - ₹5,00,000</option>
+                  <option value="Above 5,00,000">Above ₹5,00,000</option>
+                </select>
               </div>
             </div>
 
-            <div className="form-group full-width">
+            <div className="form-group">
               <label htmlFor="additionalInfo">Additional Information</label>
-              <div className="input-wrapper">
-                <textarea
-                  id="additionalInfo"
-                  name="additionalInfo"
-                  value={formData.additionalInfo}
-                  onChange={handleInputChange}
-                  rows="3"
-                  placeholder="Any other preferences, constraints, or information you'd like to share..."
-                  className="enhanced-textarea"
-                />
-                <FaBookOpen className="input-icon textarea-icon" />
-              </div>
+              <textarea
+                id="additionalInfo"
+                name="additionalInfo"
+                value={formData.additionalInfo}
+                onChange={handleInputChange}
+                rows="3"
+                placeholder="Any other preferences, constraints, or information you'd like to share..."
+                className="form-input"
+              />
             </div>
           </div>
         );
@@ -604,37 +599,53 @@ const CourseRecommendation = () => {
               Please verify all information with official sources before making decisions.
             </div>
           </div>
-          <button 
-            className="new-recommendation-btn"
+          <motion.button 
+            className="btn btn-primary"
             onClick={() => {
               setRecommendations(null);
               setCurrentStep(1);
               setFormProgress(0);
             }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <FaArrowRight className="btn-icon" />
+            <FaRocket className="btn-icon" />
             Get New Recommendations
-          </button>
+          </motion.button>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="course-recommendation-page">
-      <div className="page-header">
-        <div className="header-content">
-          <h1 className="page-title">
-            <FaGraduationCap className="title-icon" />
+    <div className="learning-page-container">
+      <div className="learning-page-wrapper">
+        {/* Header Section */}
+        <div className="learning-header">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <FaGraduationCap style={{ marginRight: '20px', fontSize: '3rem' }} />
             Course & College Recommendation
-          </h1>
-          <p className="page-subtitle">
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             Get personalized course and college recommendations based on your interests, 
             marks, and preferences using advanced AI analysis.
-          </p>
+          </motion.p>
           
           {/* Progress Bar */}
-          <div className="progress-container">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="progress-container"
+          >
             <div className="progress-bar">
               <div 
                 className="progress-fill" 
@@ -642,71 +653,108 @@ const CourseRecommendation = () => {
               ></div>
             </div>
             <span className="progress-text">{formProgress}% Complete</span>
+          </motion.div>
+        </div>
+
+        {/* Content Section */}
+        <div className="learning-content">
+          {!recommendations ? (
+            <div className="learning-sidebar">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+              >
+                <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '20px', color: 'var(--gray-800)' }}>
+                  <FaCrosshairs style={{ marginRight: '10px', color: 'var(--primary-blue)' }} />
+                  Recommendation Form
+                </h2>
+                
+                {renderStepIndicator()}
+                
+                <form onSubmit={handleSubmit} className="learning-form">
+                  {renderFormStep()}
+                  
+                  <div className="form-navigation">
+                    {currentStep > 1 && (
+                      <motion.button 
+                        type="button" 
+                        className="btn btn-outline"
+                        onClick={prevStep}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <FaArrowLeft style={{ marginRight: '8px' }} />
+                        Previous
+                      </motion.button>
+                    )}
+                    
+                    {currentStep < totalSteps ? (
+                      <motion.button 
+                        type="button" 
+                        className="btn btn-primary"
+                        onClick={nextStep}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        Next
+                        <FaArrowRight style={{ marginLeft: '8px' }} />
+                      </motion.button>
+                    ) : (
+                      <motion.button 
+                        type="submit" 
+                        className="btn btn-success"
+                        disabled={loading}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {loading ? (
+                          <>
+                            <div className="spinner" style={{ width: '20px', height: '20px', margin: '0' }}></div>
+                            Generating Recommendations...
+                          </>
+                        ) : (
+                          <>
+                            <FaUniversity style={{ marginRight: '8px' }} />
+                            Get Recommendations
+                          </>
+                        )}
+                      </motion.button>
+                    )}
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          ) : null}
+
+          <div className="learning-main">
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="card"
+                  style={{ 
+                    background: 'rgba(239, 68, 68, 0.1)', 
+                    border: '1px solid var(--accent-red)',
+                    color: 'var(--accent-red)'
+                  }}
+                >
+                  <FaExclamationTriangle style={{ marginRight: '8px' }} />
+                  {error}
+                </motion.div>
+              )}
+
+              {renderRecommendations()}
+            </motion.div>
           </div>
         </div>
       </div>
-
-      <div className="page-container">
-        {!recommendations ? (
-          <div className="form-section">
-            <div className="form-card">
-              {renderStepIndicator()}
-              
-              <form onSubmit={handleSubmit} className="recommendation-form">
-                {renderFormStep()}
-                
-                <div className="form-navigation">
-                  {currentStep > 1 && (
-                    <button 
-                      type="button" 
-                      className="nav-btn prev-btn"
-                      onClick={prevStep}
-                    >
-                      ← Previous
-                    </button>
-                  )}
-                  
-                  {currentStep < totalSteps ? (
-                    <button 
-                      type="button" 
-                      className="nav-btn next-btn"
-                      onClick={nextStep}
-                    >
-                      Next →
-                    </button>
-                  ) : (
-                    <button 
-                      type="submit" 
-                      className="submit-btn"
-                      disabled={loading}
-                    >
-                      {loading ? (
-                        <>
-                          <div className="spinner"></div>
-                          Generating Recommendations...
-                        </>
-                      ) : (
-                        <>
-                          <FaUniversity className="btn-icon" />
-                          Get Recommendations
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </form>
-            </div>
-          </div>
-        ) : null}
-
-        {error && (
-          <div className="error-message">
-            <p>❌ {error}</p>
-          </div>
-        )}
-
-        {renderRecommendations()}
-      </div>
+      <Chatbot />
     </div>
   );
 };
