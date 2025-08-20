@@ -17,85 +17,112 @@ import {
   FaCalendarAlt,
   FaBookOpen,
   FaCrosshairs,
-  FaRocket
+  FaRocket,
+  FaSync
 } from 'react-icons/fa';
 import '../styles/learning-common.css';
 import Chatbot from "../components/Chatbot";
 
 const LearningActivity = () => {
   const [activities, setActivities] = useState([]);
+  const [stats, setStats] = useState({
+    total: 0,
+    completed: 0,
+    inProgress: 0,
+    notStarted: 0,
+    completionRate: 0,
+    totalTimeSpent: 0,
+    averageScore: 0,
+    recentActivities: 0
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [expandedCard, setExpandedCard] = useState(null);
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [syncing, setSyncing] = useState(false);
   const navigate = useNavigate();
 
-  // Mock data for demonstration (since no backend processes)
-  const mockActivities = [
-    {
-      _id: '1',
-      topic: 'Machine Learning Fundamentals',
-      level: 'Intermediate',
-      duration: '45 min',
-      status: 'completed',
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      progress: 100,
-      category: 'AI & ML',
-      difficulty: 'Medium',
-      timeSpent: '45 min',
-      score: 92
-    },
-    {
-      _id: '2',
-      topic: 'Web Development with React',
-      level: 'Beginner',
-      duration: '30 min',
-      status: 'in-progress',
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      progress: 65,
-      category: 'Web Development',
-      difficulty: 'Easy',
-      timeSpent: '20 min',
-      score: null
-    },
-    {
-      _id: '3',
-      topic: 'Data Science Essentials',
-      level: 'Advanced',
-      duration: '60 min',
-      status: 'not-started',
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      progress: 0,
-      category: 'Data Science',
-      difficulty: 'Hard',
-      timeSpent: '0 min',
-      score: null
-    },
-    {
-      _id: '4',
-      topic: 'Python Programming',
-      level: 'Beginner',
-      duration: '40 min',
-      status: 'completed',
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      progress: 100,
-      category: 'Programming',
-      difficulty: 'Easy',
-      timeSpent: '40 min',
-      score: 88
+  const fetchActivities = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('Authentication required');
+        setLoading(false);
+        return;
+      }
+
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+      };
+
+      // Fetch activities with current filters
+      const params = new URLSearchParams();
+      if (filter !== 'all') params.append('status', filter);
+      if (searchTerm) params.append('search', searchTerm);
+
+      const activitiesResponse = await axios.get(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/learning-activities?${params}`,
+        config
+      );
+
+      // Fetch statistics
+      const statsResponse = await axios.get(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/learning-activities/stats`,
+        config
+      );
+
+      setActivities(activitiesResponse.data);
+      setStats(statsResponse.data);
+      setError('');
+    } catch (err) {
+      console.error('Error fetching learning activities:', err);
+      if (err.response?.status === 401) {
+        localStorage.removeItem('token');
+        navigate('/login');
+      } else {
+        setError(err.response?.data?.error || 'Failed to fetch learning activities');
+      }
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const syncData = async () => {
+    try {
+      setSyncing(true);
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        setError('Authentication required');
+        return;
+      }
+
+      const config = {
+        headers: { Authorization: `Bearer ${token}` }
+      };
+
+      await axios.post(
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/learning-activities/sync`,
+        {},
+        config
+      );
+
+      // Refresh data after sync
+      await fetchActivities();
+    } catch (err) {
+      console.error('Error syncing data:', err);
+      setError(err.response?.data?.error || 'Failed to sync data');
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   useEffect(() => {
-    // Simulate API call delay
-    const timer = setTimeout(() => {
-      setActivities(mockActivities);
-      setLoading(false);
-    }, 1000);
-
-    return () => clearTimeout(timer);
-  }, []);
+    fetchActivities();
+  }, [filter, searchTerm]);
 
   const getStatusBadge = (status) => {
     switch (status) {
@@ -129,13 +156,6 @@ const LearningActivity = () => {
                          activity.category.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesFilter && matchesSearch;
   });
-
-  const stats = {
-    total: activities.length,
-    completed: activities.filter(a => a.status === 'completed').length,
-    inProgress: activities.filter(a => a.status === 'in-progress').length,
-    notStarted: activities.filter(a => a.status === 'not-started').length
-  };
 
   return (
     <div className="learning-page-container">
@@ -171,6 +191,30 @@ const LearningActivity = () => {
           }}
         >
           <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            maxWidth: '1200px',
+            margin: '0 auto',
+            marginBottom: '20px'
+          }}>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: '700', color: 'var(--gray-800)' }}>
+              Learning Statistics
+            </h2>
+            <motion.button
+              className="btn btn-outline"
+              onClick={syncData}
+              disabled={syncing}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+            >
+              <FaSync className={syncing ? 'spinning' : ''} />
+              {syncing ? 'Syncing...' : 'Sync Data'}
+            </motion.button>
+          </div>
+          
+          <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: '20px',
@@ -181,7 +225,9 @@ const LearningActivity = () => {
               { label: 'Total Activities', value: stats.total, icon: <FaBookOpen />, color: 'var(--primary-blue)' },
               { label: 'Completed', value: stats.completed, icon: <FaCheckCircle />, color: 'var(--accent-green)' },
               { label: 'In Progress', value: stats.inProgress, icon: <FaPlay />, color: 'var(--accent-orange)' },
-              { label: 'Not Started', value: stats.notStarted, icon: <FaPause />, color: 'var(--accent-red)' }
+              { label: 'Not Started', value: stats.notStarted, icon: <FaPause />, color: 'var(--accent-red)' },
+              { label: 'Completion Rate', value: `${stats.completionRate}%`, icon: <FaChartLine />, color: 'var(--accent-green)' },
+              { label: 'Recent Activities', value: stats.recentActivities, icon: <FaClock />, color: 'var(--primary-blue)' }
             ].map((stat, index) => (
               <motion.div
                 key={stat.label}
@@ -292,13 +338,13 @@ const LearningActivity = () => {
                 </div>
                 <div style={{ fontSize: '0.875rem', color: 'var(--gray-600)' }}>
                   <div style={{ marginBottom: '8px' }}>
-                    <strong>Completion Rate:</strong> {Math.round((stats.completed / stats.total) * 100)}%
+                    <strong>Completion Rate:</strong> {stats.completionRate}%
                   </div>
                   <div style={{ marginBottom: '8px' }}>
-                    <strong>Total Time:</strong> {activities.reduce((sum, a) => sum + parseInt(a.timeSpent), 0)} min
+                    <strong>Total Time:</strong> {stats.totalTimeSpent} min
                   </div>
                   <div>
-                    <strong>Average Score:</strong> {Math.round(activities.filter(a => a.score).reduce((sum, a) => sum + a.score, 0) / activities.filter(a => a.score).length)}%
+                    <strong>Average Score:</strong> {Math.round(stats.averageScore || 0)}%
                   </div>
                 </div>
               </div>
@@ -363,7 +409,7 @@ const LearningActivity = () => {
                     >
                       <div className="card-header">
                               <div style={{ flex: 1 }}>
-                        <div className="card-title">{activity.topic}</div>
+                        <div className="card-title">{activity.title || activity.topic}</div>
                                 <div className="card-subtitle">
                                   <FaCalendarAlt style={{ marginRight: '6px', fontSize: '0.75rem' }} />
                                   {new Date(activity.createdAt).toLocaleDateString()}
@@ -373,6 +419,10 @@ const LearningActivity = () => {
                           </span>
                                   <span style={{ margin: '0 8px' }}>•</span>
                                   {activity.category}
+                                  <span style={{ margin: '0 8px' }}>•</span>
+                                  <span style={{ fontSize: '0.75rem', color: 'var(--gray-500)' }}>
+                                    {activity.activityType}
+                                  </span>
                                 </div>
                               </div>
                               
@@ -464,6 +514,14 @@ const LearningActivity = () => {
                                         className="btn btn-primary"
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          const params = new URLSearchParams();
+                                          if (activity.topic) params.set('topic', activity.topic);
+                                          if (activity.level) params.set('level', activity.level);
+                                          if (activity.duration) params.set('duration', activity.duration);
+                                          navigate(`/learning-path?${params.toString()}`);
+                                        }}
                                       >
                                         <FaPlay style={{ marginRight: '8px' }} />
                                         Continue Learning
@@ -473,21 +531,20 @@ const LearningActivity = () => {
                                         className="btn btn-outline"
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          const params = new URLSearchParams();
+                                          if (activity.topic) params.set('topic', activity.topic);
+                                          params.set('type', 'summarize');
+                                          params.set('auto', '1');
+                                          navigate(`/study-materials?${params.toString()}`);
+                                        }}
                                       >
                                         <FaBookOpen style={{ marginRight: '8px' }} />
                                         View Materials
                                       </motion.button>
                                       
-                                      {activity.status === 'completed' && (
-                                        <motion.button
-                                          className="btn btn-success"
-                                          whileHover={{ scale: 1.02 }}
-                                          whileTap={{ scale: 0.98 }}
-                                        >
-                                          <FaTrophy style={{ marginRight: '8px' }} />
-                                          View Certificate
-                                        </motion.button>
-                                      )}
+                          
                               </div>
                             </div>
                           </motion.div>

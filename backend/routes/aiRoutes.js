@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const { protect } = require('../middleware/authMiddleware');
 const LearningPathHistory = require("../models/LearningPathHistory");
 const User = require("../models/User");
+const LearningActivity = require("../models/LearningActivity");
 const { generateTextFromPrompt } = require("../utils/nimClient");
 
 dotenv.config();
@@ -37,6 +38,28 @@ router.post("/learning-path", async (req, res) => {
     });
 
     await historyEntry.save();
+
+    // Create learning activity
+    try {
+      await LearningActivity.create({
+        userId: req.user._id,
+        activityType: 'learning-path',
+        topic,
+        title: `${topic} Learning Path`,
+        level,
+        category: 'Learning Path',
+        difficulty: level === 'Beginner' ? 'Easy' : level === 'Intermediate' ? 'Medium' : 'Hard',
+        duration,
+        status: 'completed',
+        progress: 100,
+        completedAt: new Date(),
+        metadata: { originalPathId: historyEntry._id }
+      });
+    } catch (error) {
+      console.error('Error creating learning activity for learning path:', error);
+      // Don't fail the learning path generation if learning activity creation fails
+    }
+
     res.json({ response: personalizedResponse });
   } catch (error) {
     console.error("🔴 Error:", error);

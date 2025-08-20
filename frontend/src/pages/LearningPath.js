@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -28,6 +29,7 @@ const LearningPath = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
+  const location = useLocation();
 
   const levels = [
     { value: "Beginner", label: "Beginner", icon: "🌱", description: "New to the topic" },
@@ -67,6 +69,17 @@ const LearningPath = () => {
       return () => clearInterval(typingEffect);
     }
   }, [response]);
+
+  // Pre-fill from query params when navigated from LearningActivity
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const qpTopic = params.get('topic');
+    const qpLevel = params.get('level');
+    const qpDuration = params.get('duration');
+    if (qpTopic) setTopic(qpTopic);
+    if (qpLevel) setLevel(qpLevel);
+    if (qpDuration) setDuration(qpDuration);
+  }, [location.search]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

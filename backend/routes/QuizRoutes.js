@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const { chatCompletion } = require('../utils/nimClient');
 const User = require('../models/User');
+const LearningActivity = require('../models/LearningActivity');
 const { protect } = require('../middleware/authMiddleware');
 
 // Cache to store recent quizzes for topics
@@ -181,6 +182,42 @@ router.post('/quiz/submit', protect, async (req, res) => {
 
     if (!updatedUser) {
       return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Create or update learning activity
+    try {
+      const existingActivity = await LearningActivity.findOne({
+        userId,
+        activityType: 'quiz',
+        topic,
+        'metadata.quizSession': cacheKey
+      });
+
+      if (existingActivity) {
+        await existingActivity.updateScore(scorePercentage, questions.length, calculatedScore);
+      } else {
+        await LearningActivity.create({
+          userId,
+          activityType: 'quiz',
+          topic,
+          title: `${topic} Quiz`,
+          level: 'Beginner',
+          category: 'Assessment',
+          difficulty: scorePercentage >= 80 ? 'Easy' : scorePercentage >= 60 ? 'Medium' : 'Hard',
+          duration: '15 min',
+          timeSpent: '15 min',
+          status: 'completed',
+          progress: 100,
+          score: scorePercentage,
+          totalQuestions: questions.length,
+          correctAnswers: calculatedScore,
+          completedAt: new Date(),
+          metadata: { quizSession: cacheKey }
+        });
+      }
+    } catch (error) {
+      console.error('Error creating learning activity for quiz:', error);
+      // Don't fail the quiz submission if learning activity creation fails
     }
 
     return res.json({

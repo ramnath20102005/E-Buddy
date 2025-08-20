@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const { protect } = require('../middleware/authMiddleware');
 const CourseRecommendationHistory = require("../models/CourseRecommendationHistory");
 const User = require("../models/User");
+const LearningActivity = require("../models/LearningActivity");
 const { generateTextFromPrompt } = require("../utils/nimClient");
 
 dotenv.config();
@@ -101,6 +102,27 @@ Format the response in a clear, structured manner with proper headings and bulle
     });
 
     await historyEntry.save();
+
+    // Create learning activity
+    try {
+      await LearningActivity.create({
+        userId: req.user._id,
+        activityType: 'course-recommendation',
+        topic: interests,
+        title: `Course Recommendation for ${interests}`,
+        level: 'Beginner',
+        category: 'Course Recommendation',
+        difficulty: 'Medium',
+        duration: '30 min',
+        status: 'completed',
+        progress: 100,
+        completedAt: new Date(),
+        metadata: { originalRecId: historyEntry._id }
+      });
+    } catch (error) {
+      console.error('Error creating learning activity for course recommendation:', error);
+      // Don't fail the course recommendation if learning activity creation fails
+    }
 
     res.json({ 
       recommendations: personalizedResponse,

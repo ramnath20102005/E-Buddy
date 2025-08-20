@@ -75,7 +75,29 @@ const userSchema = new mongoose.Schema({
   profileCompleted: {
     type: Boolean,
     default: false
-  }
+  },
+  exp: {
+    type: Number,
+    default: 0
+  },
+  quizHistory: [{
+    topic: {
+      type: String,
+      required: true
+    },
+    score: {
+      type: Number,
+      required: true
+    },
+    totalQuestions: {
+      type: Number,
+      required: true
+    },
+    date: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 }, {
   timestamps: true
 });

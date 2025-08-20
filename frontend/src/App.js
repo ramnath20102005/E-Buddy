@@ -5,7 +5,6 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import SessionExpiryNotification from './components/SessionExpiryNotification';
 import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
 import Chatbot from './components/Chatbot';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -140,7 +139,6 @@ const AppContent = () => {
         <Route path="/career-insights" element={<ProtectedRoute><CareerInsights /></ProtectedRoute>} />
         <Route path="/course-recommendation" element={<ProtectedRoute><CourseRecommendation /></ProtectedRoute>} />
       </Routes>
-      <Footer />
     </div>
   );
 };

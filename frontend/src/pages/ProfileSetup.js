@@ -3,7 +3,6 @@ import { Form, Button, Alert } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios'; // Directly using axios
 //import Navbar from '../components/Navbar';
-import Footer from '../components/Footer';
 import '../ProfileSetup.css';
 
 const ProfileSetup = () => {
@@ -106,7 +105,6 @@ const ProfileSetup = () => {
           </Form>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

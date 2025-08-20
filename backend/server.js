@@ -20,6 +20,7 @@ const aiRoutes = require('./routes/aiRoutes');
 const careerRoutes = require('./routes/careerRoutes');
 const QuizRoutes = require('./routes/QuizRoutes');
 const courseRecommendationRoutes = require('./routes/courseRecommendationRoutes');
+const learningActivityRoutes = require('./routes/learningActivityRoutes');
 
 const app = express();
 
@@ -61,6 +62,7 @@ app.use('/api/profile', profileRoutes);
 app.use('/api', QuizRoutes); // Mounted correctly
 app.use('/api/career', careerRoutes);
 app.use('/api/course-recommendation', courseRecommendationRoutes);
+app.use('/api/learning-activities', learningActivityRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

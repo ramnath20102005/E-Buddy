@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { PDFDownloadLink, Document, Page, Text, StyleSheet } from '@react-pdf/renderer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -54,6 +54,7 @@ const StudyMaterials = () => {
     questions: 5 
   });
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Clean response text by removing ** symbols and ensuring no trimming
   const cleanResponseText = (text) => {
@@ -80,6 +81,35 @@ const StudyMaterials = () => {
       return () => clearInterval(typingEffect);
     }
   }, [response]);
+
+  // Auto-generate when navigated with topic/type params
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const qpTopic = params.get('topic');
+    const qpType = params.get('type');
+    const auto = params.get('auto');
+    if (qpTopic) setTopic(qpTopic);
+    if (qpType) setMaterialType(qpType);
+    if (auto === '1' && qpTopic) {
+      // trigger generation silently
+      (async () => {
+        try {
+          setIsLoading(true);
+          const token = localStorage.getItem('token');
+          if (!token) return;
+          const endpoint = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/ai/${qpType || 'summarize'}`;
+          const { data } = await axios.post(endpoint, { topic: qpTopic, bullets: 8 }, {
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+          });
+          setResponse(data.summary || data.flashcards || data.quiz || data.response);
+        } catch (e) {
+          // ignore auto errors; UI will show if manual try
+        } finally {
+          setIsLoading(false);
+        }
+      })();
+    }
+  }, [location.search]);
 
   const generateMaterial = async (e) => {
     e.preventDefault();
