@@ -82,7 +82,7 @@ const CourseRecommendation = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:5000/api/course-recommendation/generate',
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/course-recommendation/generate`,
         formData,
         {
           headers: {

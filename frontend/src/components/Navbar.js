@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 import { 
   FaUser, FaSignOutAlt, FaSignInAlt, FaUserPlus, FaBook, FaChartLine, FaGraduationCap, 
   FaQuestionCircle, FaUniversity, FaBars, FaTimes, FaSearch, FaChevronDown, FaSun, FaMoon
 } from 'react-icons/fa';
 
-const Navbar = ({ isAuthenticated, logout }) => {
+const Navbar = () => {
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
@@ -48,7 +50,6 @@ const Navbar = ({ isAuthenticated, logout }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/landing');
   };
 
   const handleSearchSubmit = (e) => {

@@ -76,7 +76,7 @@ const CareerPath = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/career/generate",
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/career/generate`,
         {},
         {
           headers: {
@@ -102,7 +102,7 @@ const CareerPath = () => {
 
     try {
       const { data } = await axios.get(
-        "http://localhost:5000/api/career/history",
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/career/history`,
         {
           headers: {
             'Authorization': `Bearer ${token}`

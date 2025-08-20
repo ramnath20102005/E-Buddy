@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
+import SessionExpiryNotification from './components/SessionExpiryNotification';
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Chatbot from './components/Chatbot';
@@ -19,11 +22,9 @@ import CareerInsights from './pages/CareerInsights';
 import CourseRecommendation from './pages/CourseRecommendation';
 import './App.css';
 
-const App = () => {
+const AppContent = () => {
+  const { isAuthenticated, logout } = useAuth();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return !!localStorage.getItem('token');
-  });
   const featuresRef = useRef(null);
   const carouselImages = [
     `${process.env.PUBLIC_URL}/carousel_images/learning1.jpg`,
@@ -31,10 +32,7 @@ const App = () => {
     `${process.env.PUBLIC_URL}/carousel_images/learning3.jpg`
   ];
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setIsAuthenticated(!!token);
-  }, []);
+
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -68,11 +66,7 @@ const App = () => {
     featuresRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const logout = () => {
-    localStorage.removeItem('token');
-    sessionStorage.removeItem('userId');
-    setIsAuthenticated(false);
-  };
+
 
   const features = [
     {
@@ -108,40 +102,55 @@ const App = () => {
   const titleText = "Welcome to E-Buddy";
   const subtitleText = "Your intelligent learning companion";
 
+
+
+  return (
+    <div className="app-container">
+      <SessionExpiryNotification />
+      <Navbar />
+      <Routes>
+        <Route
+          path="/"
+          element={<Navigate to={isAuthenticated ? "/home" : "/landing"} />}
+        />
+
+        <Route
+          path="/landing"
+          element={isAuthenticated ? <Navigate to="/home" /> : <Landing />}
+        />
+
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/profile-setup" element={<ProtectedRoute><ProfileSetup /></ProtectedRoute>} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/learning-path" element={<ProtectedRoute><LearningPath /></ProtectedRoute>} />
+        <Route path="/study-materials" element={<ProtectedRoute><StudyMaterials /></ProtectedRoute>} />
+        <Route path="/careerpath" element={<ProtectedRoute><CareerPath /></ProtectedRoute>} />
+        <Route path="/quiz" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
+        <Route path="/learning-activity" element={<ProtectedRoute><LearningActivity /></ProtectedRoute>} />
+        <Route path="/career-insights" element={<ProtectedRoute><CareerInsights /></ProtectedRoute>} />
+        <Route path="/course-recommendation" element={<ProtectedRoute><CourseRecommendation /></ProtectedRoute>} />
+      </Routes>
+      <Footer />
+    </div>
+  );
+};
+
+const App = () => {
   return (
     <Router>
-      <div className="app-container">
-        <Navbar isAuthenticated={isAuthenticated} logout={logout} />
-        <Routes>
-          <Route
-            path="/"
-            element={<Navigate to={isAuthenticated ? "/home" : "/landing"} />}
-          />
-
-          <Route
-            path="/landing"
-            element={isAuthenticated ? <Navigate to="/home" /> : <Landing />}
-          />
-
-          <Route
-            path="/home"
-            element={isAuthenticated ? <Home /> : <Navigate to="/landing" />}
-          />
-
-          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-          <Route path="/signup" element={<Signup setIsAuthenticated={setIsAuthenticated} />} />
-          <Route path="/profile-setup" element={isAuthenticated ? <ProfileSetup /> : <Navigate to="/landing" />} />
-          <Route path="/profile" element={isAuthenticated ? <Profile /> : <Navigate to="/landing" />} />
-          <Route path="/learning-path" element={isAuthenticated ? <LearningPath /> : <Navigate to="/landing" />} />
-          <Route path="/study-materials" element={isAuthenticated ? <StudyMaterials /> : <Navigate to="/landing" />} />
-          <Route path="/careerpath" element={isAuthenticated ? <CareerPath /> : <Navigate to="/landing" />} />
-          <Route path="/quiz" element={isAuthenticated ? <QuizPage /> : <Navigate to="/landing" />} />
-          <Route path="/learning-activity" element={isAuthenticated ? <LearningActivity /> : <Navigate to="/landing" />} />
-          <Route path="/career-insights" element={isAuthenticated ? <CareerInsights /> : <Navigate to="/landing" />} />
-          <Route path="/course-recommendation" element={isAuthenticated ? <CourseRecommendation /> : <Navigate to="/landing" />} />
-        </Routes>
-        <Footer />
-      </div>
+      <AuthProvider>
+        <AppContent />
+      </AuthProvider>
     </Router>
   );
 };

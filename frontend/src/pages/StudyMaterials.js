@@ -97,7 +97,7 @@ const StudyMaterials = () => {
         throw new Error('Please login first');
       }
 
-      const endpoint = `http://localhost:5000/api/ai/${materialType}`;
+              const endpoint = `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/ai/${materialType}`;
       const requestData = { 
         topic,
         bullets: materialType === 'summarize' ? additionalOptions.bullets : undefined,

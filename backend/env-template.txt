@@ -1,0 +1,5 @@
+MONGO_URI=mongodb://localhost:27017/ebuddy
+JWT_SECRET=ebuddy_super_secret_key_2024_secure_jwt_token
+NVIDIA_API_KEY=your_nvidia_nim_api_key_here
+NODE_ENV=development
+PORT=5000

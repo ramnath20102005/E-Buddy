@@ -35,7 +35,7 @@ const ProfileSetup = () => {
       };
 
       // Send request to update profile
-      await axios.put('http://localhost:5000/api/profile', profileData, {
+              await axios.put(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/profile`, profileData, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

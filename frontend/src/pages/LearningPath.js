@@ -83,7 +83,7 @@ const LearningPath = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/ai/learning-path",
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/ai/learning-path`,
         { topic, level, duration },
         {
           headers: {
@@ -111,7 +111,7 @@ const LearningPath = () => {
 
     try {
       const { data } = await axios.get(
-        "http://localhost:5000/api/ai/learning-path/history",
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/ai/learning-path/history`,
         {
           headers: {
             'Authorization': `Bearer ${token}`

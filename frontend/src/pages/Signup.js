@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import "../Auth.css";
 import { 
   FaEnvelope, 
@@ -16,7 +17,8 @@ import {
   FaLightbulb
 } from "react-icons/fa";
 
-const Signup = ({ setIsAuthenticated }) => {
+const Signup = () => {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -112,7 +114,7 @@ const Signup = ({ setIsAuthenticated }) => {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/auth/signup", {
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/signup`, {
         name: formData.name,
         email: formData.email,
         password: formData.password,
@@ -120,14 +122,11 @@ const Signup = ({ setIsAuthenticated }) => {
         educationLevel: formData.educationLevel
       });
 
-      // Store token in localStorage
-      localStorage.setItem("token", data.token);
+      // Use the login function from AuthContext
+      login(data.token, data.user);
 
       // Store userId in sessionStorage for tracking progress
       sessionStorage.setItem("userId", data.userId);
-
-      // Update authentication state
-      setIsAuthenticated(true);
 
       // Redirect to Profile Setup
       navigate("/profile-setup");

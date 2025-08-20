@@ -193,8 +193,9 @@ const Profile = () => {
   };
 
   const addSkill = (skill) => {
-    if (skill.trim() && !skills.includes(skill.trim())) {
-      setSkills([...skills, skill.trim()]);
+    const trimmedSkill = skill.trim();
+    if (trimmedSkill && !skills.includes(trimmedSkill)) {
+      setSkills(prevSkills => [...prevSkills, trimmedSkill]);
     }
   };
 
@@ -203,8 +204,9 @@ const Profile = () => {
   };
 
   const addInterest = (interest) => {
-    if (interest.trim() && !interests.includes(interest.trim())) {
-      setInterests([...interests, interest.trim()]);
+    const trimmedInterest = interest.trim();
+    if (trimmedInterest && !interests.includes(trimmedInterest)) {
+      setInterests(prevInterests => [...prevInterests, trimmedInterest]);
     }
   };
 
@@ -213,8 +215,9 @@ const Profile = () => {
   };
 
   const addAchievement = (achievement) => {
-    if (achievement.trim() && !achievements.includes(achievement.trim())) {
-      setAchievements([...achievements, achievement.trim()]);
+    const trimmedAchievement = achievement.trim();
+    if (trimmedAchievement && !achievements.includes(trimmedAchievement)) {
+      setAchievements(prevAchievements => [...prevAchievements, trimmedAchievement]);
     }
   };
 
@@ -322,8 +325,11 @@ const Profile = () => {
                     placeholder="Add a new skill"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        addSkill(e.target.value);
-                        e.target.value = '';
+                        const value = e.target.value.trim();
+                        if (value) {
+                          addSkill(value);
+                          e.target.value = '';
+                        }
                       }
                     }}
                     className="add-item-input"
@@ -333,8 +339,11 @@ const Profile = () => {
                     size="sm"
                     onClick={(e) => {
                       const input = e.target.previousSibling;
-                      addSkill(input.value);
-                      input.value = '';
+                      const value = input.value.trim();
+                      if (value) {
+                        addSkill(value);
+                        input.value = '';
+                      }
                     }}
                   >
                     <FaPlus />
@@ -373,8 +382,11 @@ const Profile = () => {
                     placeholder="Add a new interest"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        addInterest(e.target.value);
-                        e.target.value = '';
+                        const value = e.target.value.trim();
+                        if (value) {
+                          addInterest(value);
+                          e.target.value = '';
+                        }
                       }
                     }}
                     className="add-item-input"
@@ -384,8 +396,11 @@ const Profile = () => {
                     size="sm"
                     onClick={(e) => {
                       const input = e.target.previousSibling;
-                      addInterest(input.value);
-                      input.value = '';
+                      const value = input.value.trim();
+                      if (value) {
+                        addInterest(value);
+                        input.value = '';
+                      }
                     }}
                   >
                     <FaPlus />
@@ -424,8 +439,11 @@ const Profile = () => {
                     placeholder="Add a new achievement"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
-                        addAchievement(e.target.value);
-                        e.target.value = '';
+                        const value = e.target.value.trim();
+                        if (value) {
+                          addAchievement(value);
+                          e.target.value = '';
+                        }
                       }
                     }}
                     className="add-item-input"
@@ -435,8 +453,11 @@ const Profile = () => {
                     size="sm"
                     onClick={(e) => {
                       const input = e.target.previousSibling;
-                      addAchievement(input.value);
-                      input.value = '';
+                      const value = input.value.trim();
+                      if (value) {
+                        addAchievement(value);
+                        input.value = '';
+                      }
                     }}
                   >
                     <FaPlus />
@@ -660,8 +681,11 @@ const Profile = () => {
                             onKeyPress={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault();
-                                addSkill(e.target.value);
-                                e.target.value = '';
+                                const value = e.target.value.trim();
+                                if (value) {
+                                  addSkill(value);
+                                  e.target.value = '';
+                                }
                               }
                             }}
                             className="add-item-input"
@@ -672,8 +696,11 @@ const Profile = () => {
                             size="sm"
                             onClick={(e) => {
                               const input = e.target.previousSibling;
-                              addSkill(input.value);
-                              input.value = '';
+                              const value = input.value.trim();
+                              if (value) {
+                                addSkill(value);
+                                input.value = '';
+                              }
                             }}
                           >
                             <FaPlus />
@@ -713,8 +740,11 @@ const Profile = () => {
                             onKeyPress={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault();
-                                addInterest(e.target.value);
-                                e.target.value = '';
+                                const value = e.target.value.trim();
+                                if (value) {
+                                  addInterest(value);
+                                  e.target.value = '';
+                                }
                               }
                             }}
                             className="add-item-input"
@@ -725,8 +755,11 @@ const Profile = () => {
                             size="sm"
                             onClick={(e) => {
                               const input = e.target.previousSibling;
-                              addInterest(input.value);
-                              input.value = '';
+                              const value = input.value.trim();
+                              if (value) {
+                                addInterest(value);
+                                input.value = '';
+                              }
                             }}
                           >
                             <FaPlus />
@@ -766,8 +799,11 @@ const Profile = () => {
                             onKeyPress={(e) => {
                               if (e.key === 'Enter') {
                                 e.preventDefault();
-                                addAchievement(e.target.value);
-                                e.target.value = '';
+                                const value = e.target.value.trim();
+                                if (value) {
+                                  addAchievement(value);
+                                  e.target.value = '';
+                                }
                               }
                             }}
                             className="add-item-input"
@@ -778,8 +814,11 @@ const Profile = () => {
                             size="sm"
                             onClick={(e) => {
                               const input = e.target.previousSibling;
-                              addAchievement(input.value);
-                              input.value = '';
+                              const value = input.value.trim();
+                              if (value) {
+                                addAchievement(value);
+                                input.value = '';
+                              }
                             }}
                           >
                             <FaPlus />

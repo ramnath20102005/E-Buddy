@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 import "../Auth.css";
 import { 
   FaEnvelope, 
@@ -13,7 +14,8 @@ import {
   FaCheckCircle
 } from "react-icons/fa";
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -29,19 +31,16 @@ const Login = ({ setIsAuthenticated }) => {
     setIsLoading(true);
 
     try {
-      const { data } = await axios.post("http://localhost:5000/api/auth/login", {
+      const { data } = await axios.post(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/auth/login`, {
         email,
         password,
       });
 
-      // Store token in localStorage
-      localStorage.setItem("token", data.token);
+      // Use the login function from AuthContext
+      login(data.token, data.user);
 
       // Store userId in sessionStorage for tracking progress
       sessionStorage.setItem("userId", data.userId);
-
-      // Update authentication state
-      setIsAuthenticated(true);
 
       // Redirect to Home Page
       navigate("/home");

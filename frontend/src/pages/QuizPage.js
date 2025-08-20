@@ -47,7 +47,7 @@ const QuizPage = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:5000/api/quiz", {
+              const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/quiz`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -119,7 +119,7 @@ const QuizPage = () => {
     setError(null);
     
     try {
-      const response = await fetch("http://localhost:5000/api/quiz/submit", {
+              const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/quiz/submit`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
