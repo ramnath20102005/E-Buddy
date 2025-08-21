@@ -4,7 +4,7 @@ const path = require('path');
 const morgan = require('morgan');
 const cors = require('cors');
 const connectDB = require('./config/db');
-const { notFound, errorHandler } = require('./middleware/errorMiddleware');
+const { notFound, errorHandler } = require('./middleware/errormiddleware');
 
 // Load environment variables first
 dotenv.config();
