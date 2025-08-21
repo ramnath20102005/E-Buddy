@@ -47,9 +47,19 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
 
-// Additional CORS headers as fallback
+// Additional CORS headers as fallback - dynamic based on origin
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://e-buddy-frontend.onrender.com');
+  const origin = req.headers.origin;
+  const allowedOrigins = [
+    "https://e-buddy-frontend.onrender.com",
+    "http://localhost:1000",
+    "http://localhost:3000",
+    "http://localhost:5000"
+  ];
+  
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
   res.header('Access-Control-Allow-Credentials', 'true');
