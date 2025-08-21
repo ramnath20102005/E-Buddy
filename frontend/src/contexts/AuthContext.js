@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { isTokenExpired, clearAuthData } from '../utils/authUtils';
+import API_BASE_URL from '../config/api';
 
 const AuthContext = createContext();
 
@@ -54,7 +55,7 @@ export const AuthProvider = ({ children }) => {
 
       // Verify token with backend
       try {
-        const response = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/profile`, {
+        const response = await axios.get(`${API_BASE_URL}/api/profile`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import API_BASE_URL from '../config/api';
 import './Chatbot.css';
 const chatbotIcon = "/chatbot-icon.png"; // Make sure this path is correct
 
@@ -296,7 +297,7 @@ const Chatbot = () => {
         return;
       }
 
-      const response = await axios.get(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/profile`, {
+      const response = await axios.get(`${API_BASE_URL}/api/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -437,7 +438,7 @@ const Chatbot = () => {
 
       // Send message to backend API
       const response = await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/ai/chatbot`, 
+        `${API_BASE_URL}/api/ai/chatbot`, 
         { message: messageText },
         {
           headers: {
