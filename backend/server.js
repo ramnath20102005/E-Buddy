@@ -34,9 +34,10 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 const corsOptions = {
   origin: process.env.NODE_ENV === 'production' 
     ? [
-        process.env.FRONTEND_URL || "https://your-frontend-app.onrender.com",
+        "https://e-buddy-frontend.onrender.com",
+        process.env.FRONTEND_URL,
         /\.onrender\.com$/
-      ]
+      ].filter(Boolean)
     : [
         "http://localhost:3000",
         "http://localhost:5000",
