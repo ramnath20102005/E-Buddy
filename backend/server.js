@@ -32,18 +32,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 const corsOptions = {
-  origin: process.env.NODE_ENV === 'production' 
-    ? [
-        "https://e-buddy-frontend.onrender.com",
-        process.env.FRONTEND_URL,
-        /\.onrender\.com$/
-      ].filter(Boolean)
-    : [
-        "http://localhost:3000",
-        "http://localhost:5000",
-        "http://127.0.0.1:3000",
-        "http://localhost:1000"
-      ],
+  origin: true, // Temporarily allow all origins for immediate fix
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   credentials: true,
@@ -52,6 +41,15 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.options('*', cors(corsOptions));
+
+// Additional CORS headers as fallback
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', 'https://e-buddy-frontend.onrender.com');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Allow-Credentials', 'true');
+  next();
+});
 
 app.use((req, res, next) => {
   console.log(`Incoming ${req.method} request to ${req.originalUrl}`);
