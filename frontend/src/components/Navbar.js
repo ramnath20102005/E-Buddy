@@ -141,6 +141,17 @@ const Navbar = () => {
                     Home
                   </Link>
                 </li>
+                <li>
+                  <a 
+                    href="https://news-curator-deployed-1.onrender.com" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="external-link"
+                    onClick={closeAllMenus}
+                  >
+                    News
+                  </a>
+                </li>
                 {/* Learn dropdown */}
                 <li className={`dropdown ${openDropdown === 'learn' ? 'open' : ''}`}>
                   <button className="dropdown-toggle" onClick={() => toggleDropdown('learn')}>
