@@ -2,9 +2,9 @@ services:
   - type: web
     name: ebuddy-backend
     env: node
-    build:
-      buildCommand: npm install
-      startCommand: npm start
+    rootDir: ./backend
+    buildCommand: npm install
+    startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
@@ -16,8 +16,9 @@ services:
         fromDatabase:
           name: ebuddy-mongodb
           property: connectionString
+      - key: NVIDIA_API_KEY
+        sync: false
     plan: free
-    numInstances: 1
 
 databases:
   - name: ebuddy-mongodb
