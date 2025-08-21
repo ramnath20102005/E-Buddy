@@ -54,7 +54,8 @@ const parseQuizResponse = (responseText, requestedQuestions) => {
 };
 
 router.post('/quiz', protect, async (req, res) => {
-  const { topic, numberOfQuestions = 5 } = req.body;
+  const { topic, numberOfQuestions = 5, manualDifficulty } = req.body;
+  const userId = req.user.id;
 
   // Validate inputs
   if (!topic || typeof topic !== 'string') {
@@ -65,8 +66,42 @@ router.post('/quiz', protect, async (req, res) => {
   const parsedNumberOfQuestions = Math.min(Math.max(1, Number(numberOfQuestions)), 10);
 
   try {
-    // Create a unique cache key that includes the number of questions
-    const cacheKey = `${topic.toLowerCase()}_${parsedNumberOfQuestions}`;
+    // Fetch user's education level to determine difficulty
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Determine difficulty level - use manual selection if provided, otherwise auto-adapt
+    let difficulty;
+    if (manualDifficulty && ['Easy', 'Intermediate', 'Advanced'].includes(manualDifficulty)) {
+      // Use manual difficulty selection
+      const difficultyMapping = {
+        'Easy': { level: 'Beginner', description: 'foundational concepts and basic principles' },
+        'Intermediate': { level: 'Intermediate', description: 'intermediate concepts with practical applications' },
+        'Advanced': { level: 'Advanced', description: 'advanced concepts and complex problem-solving' }
+      };
+      difficulty = difficultyMapping[manualDifficulty];
+    } else {
+      // Auto-adapt based on education level
+      const getDifficultyLevel = (educationLevel) => {
+        switch (educationLevel) {
+          case 'High School':
+            return { level: 'Beginner', description: 'foundational concepts and basic principles' };
+          case 'Undergraduate':
+          case 'Graduate':
+            return { level: 'Intermediate', description: 'intermediate concepts with practical applications' };
+          case 'Professional':
+            return { level: 'Advanced', description: 'advanced concepts and complex problem-solving' };
+          default:
+            return { level: 'Intermediate', description: 'intermediate concepts with practical applications' };
+        }
+      };
+      difficulty = getDifficultyLevel(user.educationLevel);
+    }
+    
+    // Create a unique cache key that includes difficulty and number of questions
+    const cacheKey = `${topic.toLowerCase()}_${parsedNumberOfQuestions}_${difficulty.level.toLowerCase()}`;
     
     // Check cache first
     const cachedQuiz = quizCache.get(cacheKey);
@@ -76,11 +111,14 @@ router.post('/quiz', protect, async (req, res) => {
 
     const quizSeed = generateQuizSeed(topic, parsedNumberOfQuestions);
 
-    const prompt = `Generate a unique and challenging multiple-choice quiz about ${topic}.
+    const prompt = `Generate a unique multiple-choice quiz about ${topic} at ${difficulty.level} level.
 Ensure the following requirements:
 - Generate exactly ${parsedNumberOfQuestions} questions
+- Target ${difficulty.level} difficulty focusing on ${difficulty.description}
 - Each question should test a unique concept or knowledge area
-- Avoid trivial or overly simple questions
+- For Beginner: Focus on definitions, basic concepts, and simple applications
+- For Intermediate: Include practical scenarios, analysis, and moderate complexity
+- For Advanced: Include complex problem-solving, critical thinking, and expert-level concepts
 - Provide 4 plausible but distinct answer options
 - Clearly mark the correct answer
 Use this randomization seed: ${quizSeed}
@@ -91,7 +129,8 @@ Format strictly as JSON without code fences:
     {
       "question": "Detailed question text",
       "options": ["option1", "option2", "option3", "option4"],
-      "correctAnswer": "correct option"
+      "correctAnswer": "correct option",
+      "difficulty": "${difficulty.level}"
     }
   ]
 }`;
@@ -101,7 +140,11 @@ Format strictly as JSON without code fences:
     ], { temperature: 0.7, max_tokens: 1024 });
     const quizData = parseQuizResponse(responseText, parsedNumberOfQuestions);
 
-    // Cache the quiz with the specific number of questions
+    // Add difficulty info to the response
+    quizData.difficulty = difficulty.level;
+    quizData.educationLevel = user.educationLevel;
+
+    // Cache the quiz with the specific number of questions and difficulty
     quizCache.set(cacheKey, {
       quiz: quizData,
       timestamp: Date.now()
@@ -139,8 +182,31 @@ router.post('/quiz/submit', protect, async (req, res) => {
   const parsedNumberOfQuestions = Math.min(Math.max(1, Number(numberOfQuestions)), 10);
 
   try {
-    // Retrieve the cached quiz
-    const cacheKey = `${topic.toLowerCase()}_${parsedNumberOfQuestions}`;
+    // Fetch user's education level to determine difficulty for cache key
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Map education level to difficulty
+    const getDifficultyLevel = (educationLevel) => {
+      switch (educationLevel) {
+        case 'High School':
+          return 'Beginner';
+        case 'Undergraduate':
+        case 'Graduate':
+          return 'Intermediate';
+        case 'Professional':
+          return 'Advanced';
+        default:
+          return 'Intermediate';
+      }
+    };
+
+    const difficultyLevel = getDifficultyLevel(user.educationLevel);
+    
+    // Retrieve the cached quiz with difficulty included in cache key
+    const cacheKey = `${topic.toLowerCase()}_${parsedNumberOfQuestions}_${difficultyLevel.toLowerCase()}`;
     const cachedQuiz = quizCache.get(cacheKey);
     
     if (!cachedQuiz) {

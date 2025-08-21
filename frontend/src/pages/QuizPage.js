@@ -30,6 +30,9 @@ const QuizPage = () => {
   const [error, setError] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [timeRemaining, setTimeRemaining] = useState(0);
+  const [difficulty, setDifficulty] = useState(null);
+  const [educationLevel, setEducationLevel] = useState(null);
+  const [manualDifficulty, setManualDifficulty] = useState('auto'); // 'auto', 'Easy', 'Intermediate', 'Advanced'
   const navigate = useNavigate();
 
   const fetchQuestions = async () => {
@@ -55,7 +58,8 @@ const QuizPage = () => {
         },
         body: JSON.stringify({ 
           topic,
-          numberOfQuestions // Send the number of questions to the backend
+          numberOfQuestions, // Send the number of questions to the backend
+          manualDifficulty: manualDifficulty !== 'auto' ? manualDifficulty : undefined // Send manual difficulty if not auto
         }),
       });
       
@@ -72,6 +76,10 @@ const QuizPage = () => {
       // Limit questions to user-specified number
       const limitedQuestions = data.questions.slice(0, numberOfQuestions);
       setQuestions(limitedQuestions);
+      
+      // Set difficulty and education level info
+      setDifficulty(data.difficulty);
+      setEducationLevel(data.educationLevel);
       
       // Set timer: 1.5 minutes per question
       setTimeRemaining(limitedQuestions.length * 90);
@@ -168,6 +176,9 @@ const QuizPage = () => {
     setScore(null);
     setCurrentQuestion(0);
     setTopic("");
+    setDifficulty(null);
+    setEducationLevel(null);
+    setManualDifficulty('auto');
   };
 
   return (
@@ -204,8 +215,28 @@ const QuizPage = () => {
                 <FaCrosshairs style={{ marginRight: '10px', color: 'var(--primary-blue)' }} />
                 Quiz Setup
               </h2>
+              
+              {/* Display difficulty level info */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="card"
+                style={{ 
+                  marginBottom: '20px',
+                  background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(147, 51, 234, 0.1))',
+                  border: '1px solid rgba(59, 130, 246, 0.2)'
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '8px' }}>
+                  <FaGraduationCap style={{ marginRight: '8px', color: 'var(--primary-blue)' }} />
+                  <strong>Adaptive Difficulty</strong>
+                </div>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-600)' }}>
+                  Quiz difficulty automatically adjusts based on your education level for personalized learning.
+                </p>
+              </motion.div>
       
-                    <div className="learning-form">
+              <div className="learning-form">
                 <div className="form-group">
                   <label>What topic do you want to quiz on?</label>
                   <input
@@ -230,6 +261,25 @@ const QuizPage = () => {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Difficulty Level</label>
+                  <select
+                    className="form-select"
+                    value={manualDifficulty}
+                    onChange={(e) => setManualDifficulty(e.target.value)}
+                  >
+                    <option value="auto">Auto (Based on Education Level)</option>
+                    <option value="Easy">Easy</option>
+                    <option value="Intermediate">Intermediate</option>
+                    <option value="Advanced">Advanced</option>
+                  </select>
+                  {manualDifficulty === 'auto' && (
+                    <small style={{ color: 'var(--gray-600)', fontSize: '0.85rem', marginTop: '4px', display: 'block' }}>
+                      Difficulty will be automatically set based on your education level from profile
+                    </small>
+                  )}
                 </div>
 
                 <motion.button 
@@ -297,24 +347,35 @@ const QuizPage = () => {
           animate={{ opacity: 1 }}
         >
                 <div className="card" style={{ marginBottom: '24px' }}>
-                  {/* Timer */}
+                  {/* Quiz Info Header */}
                   <div style={{ 
                     display: 'flex', 
                     alignItems: 'center', 
                     justifyContent: 'space-between',
                     marginBottom: '20px'
                   }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <FaClock style={{ color: 'var(--accent-orange)' }} />
-                      <span style={{ fontWeight: '600' }}>Time Remaining:</span>
-                    </div>
-                    <div style={{ 
-                      fontSize: '1.5rem', 
-                      fontWeight: '800', 
-                      color: 'var(--accent-orange)',
-                      fontFamily: 'monospace'
-                    }}>
-                      {formatTime(timeRemaining)}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <FaClock style={{ color: 'var(--accent-orange)' }} />
+                        <span style={{ fontWeight: '600' }}>Time:</span>
+                        <span style={{ 
+                          fontSize: '1.2rem', 
+                          fontWeight: '800', 
+                          color: 'var(--accent-orange)',
+                          fontFamily: 'monospace'
+                        }}>
+                          {formatTime(timeRemaining)}
+                        </span>
+                      </div>
+                      {difficulty && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <FaLightbulb style={{ color: 'var(--primary-blue)' }} />
+                          <span style={{ fontWeight: '600' }}>Level:</span>
+                          <span className={`badge ${difficulty === 'Beginner' ? 'badge-success' : difficulty === 'Intermediate' ? 'badge-warning' : 'badge-danger'}`}>
+                            {difficulty}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 

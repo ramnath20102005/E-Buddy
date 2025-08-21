@@ -17,6 +17,7 @@ import Landing from './pages/Landing';
 import Home from './pages/Home';
 import QuizPage from './pages/QuizPage';
 import LearningActivity from './pages/LearningActivity';
+import LearningPage from './pages/LearningPage';
 import CareerInsights from './pages/CareerInsights';
 import CourseRecommendation from './pages/CourseRecommendation';
 import './App.css';
@@ -136,6 +137,7 @@ const AppContent = () => {
         <Route path="/careerpath" element={<ProtectedRoute><CareerPath /></ProtectedRoute>} />
         <Route path="/quiz" element={<ProtectedRoute><QuizPage /></ProtectedRoute>} />
         <Route path="/learning-activity" element={<ProtectedRoute><LearningActivity /></ProtectedRoute>} />
+        <Route path="/learning" element={<ProtectedRoute><LearningPage /></ProtectedRoute>} />
         <Route path="/career-insights" element={<ProtectedRoute><CareerInsights /></ProtectedRoute>} />
         <Route path="/course-recommendation" element={<ProtectedRoute><CourseRecommendation /></ProtectedRoute>} />
       </Routes>

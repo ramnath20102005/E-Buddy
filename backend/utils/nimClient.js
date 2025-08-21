@@ -61,8 +61,11 @@ async function chatCompletion(messages, options = {}) {
 }
 
 async function generateTextFromPrompt(prompt, options = {}) {
+  console.log('🔍 NIM Client - Sending prompt to AI:', prompt.substring(0, 100) + '...');
   const messages = [{ role: "user", content: prompt }];
-  return chatCompletion(messages, options);
+  const result = await chatCompletion(messages, options);
+  console.log('🔍 NIM Client - AI response received:', result.substring(0, 100) + '...');
+  return result;
 }
 
 module.exports = {

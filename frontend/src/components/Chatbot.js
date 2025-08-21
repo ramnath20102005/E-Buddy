@@ -5,7 +5,7 @@ const chatbotIcon = "/chatbot-icon.png"; // Make sure this path is correct
 
 const Chatbot = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([{ text: "Hello! How can I assist you today?", sender: "bot" }]);
+  const [messages, setMessages] = useState([{ text: "Hello! I'm E-Buddy, your learning platform assistant. I can help you with learning paths, quizzes, courses, profile settings, and navigating the platform. How can I assist you today?", sender: "bot" }]);
   const [userInput, setUserInput] = useState("");
   const [username, setUsername] = useState("");
   const [hasGreeted, setHasGreeted] = useState(false);
@@ -316,13 +316,13 @@ const Chatbot = () => {
     
     // Add dynamic greeting based on user context
     if (userBehavior.visitCount === 1) {
-      greeting += "Welcome to our learning platform! I'm your E-Buddy assistant. How can I help you get started today?";
+      greeting += "Welcome to E-Buddy! I'm your dedicated learning platform assistant. I can help you with learning paths, quizzes, profile management, and navigating our platform features. How can I help you get started?";
     } else if (userBehavior.visitCount > 5) {
-      greeting += "Welcome back! You're becoming a regular here. How can I assist your learning journey today?";
+      greeting += "Welcome back! I'm here to help with any E-Buddy platform questions - learning paths, quizzes, assignments, or account settings. What can I assist you with today?";
     } else if (userBehavior.preferredTopic) {
-      greeting += `Looking for more information about ${userBehavior.preferredTopic}? I'm here to help!`;
+      greeting += `Ready to explore more ${userBehavior.preferredTopic} on E-Buddy? I'm here to help with platform features and learning tools!`;
     } else {
-      greeting += "How can I assist with your learning today?";
+      greeting += "I'm here to help with E-Buddy platform features, learning activities, and navigation. What would you like to know?";
     }
     
     return greeting;

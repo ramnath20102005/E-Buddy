@@ -135,7 +135,7 @@ learningActivitySchema.methods.updateScore = function(score, totalQuestions, cor
 // Static method to get user statistics
 learningActivitySchema.statics.getUserStats = async function(userId) {
   const stats = await this.aggregate([
-    { $match: { userId: mongoose.Types.ObjectId(userId) } },
+    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
     {
       $group: {
         _id: null,

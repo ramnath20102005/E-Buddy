@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -11,9 +11,7 @@ import {
   FaRocket,
   FaCheckCircle,
   FaArrowRight,
-  FaPlay,
-  FaDownload,
-  FaShare
+  FaPlay
 } from 'react-icons/fa';
 import '../styles/learning-common.css';
 import Chatbot from "../components/Chatbot";
@@ -30,6 +28,7 @@ const LearningPath = () => {
   const [selectedHistoryItem, setSelectedHistoryItem] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
 
   const levels = [
     { value: "Beginner", label: "Beginner", icon: "🌱", description: "New to the topic" },
@@ -391,28 +390,28 @@ const LearningPath = () => {
                           className="btn btn-success"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
+                          disabled={!topic || !level || !duration || !response}
+                          onClick={() => {
+                            console.log('🔍 Main Start Learning - Current state:', { topic, level, duration, response: response?.substring(0, 50) + '...' });
+                            if (!topic || !level || !duration || !response) {
+                              console.log('🚨 Missing required data for Start Learning');
+                              return;
+                            }
+                            navigate('/learning', {
+                              state: {
+                                topic: topic,
+                                level: level,
+                                duration: duration,
+                                learningPath: response,
+                                category: 'Learning Path'
+                              }
+                            });
+                          }}
                         >
                           <FaPlay style={{ marginRight: '8px' }} />
                           Start Learning
                         </motion.button>
                         
-                        <motion.button
-                          className="btn btn-outline"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <FaDownload style={{ marginRight: '8px' }} />
-                          Save Path
-                        </motion.button>
-                        
-                        <motion.button
-                          className="btn btn-outline"
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <FaShare style={{ marginRight: '8px' }} />
-                          Share
-                        </motion.button>
                       </div>
                     </div>
                   ) : (
@@ -467,6 +466,29 @@ const LearningPath = () => {
                           
                           <div className="response-text">
                             {cleanResponseText(selectedHistoryItem.responseText)}
+                          </div>
+                          
+                          {/* Start Learning Button for History Item */}
+                          <div style={{ marginTop: '20px', paddingTop: '20px', borderTop: '1px solid var(--gray-200)' }}>
+                            <motion.button
+                              className="btn btn-success"
+                              whileHover={{ scale: 1.05 }}
+                              whileTap={{ scale: 0.95 }}
+                              onClick={() => {
+                                navigate('/learning', {
+                                  state: {
+                                    topic: selectedHistoryItem.topic,
+                                    level: selectedHistoryItem.level,
+                                    duration: selectedHistoryItem.duration,
+                                    learningPath: selectedHistoryItem.responseText,
+                                    category: 'Learning Path'
+                                  }
+                                });
+                              }}
+                            >
+                              <FaPlay style={{ marginRight: '8px' }} />
+                              Start Learning
+                            </motion.button>
                           </div>
                         </div>
                       </div>
