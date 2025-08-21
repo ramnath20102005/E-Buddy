@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: ebuddy-backend
+    env: node
+    build:
+      buildCommand: npm install
+      startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: MONGO_URI
+        fromDatabase:
+          name: ebuddy-mongodb
+          property: connectionString
+    plan: free
+    numInstances: 1
+
+databases:
+  - name: ebuddy-mongodb
+    databaseName: ebuddy
+    user: ebuddy_user
+    plan: free
+    mongoVersion: "6.0"
