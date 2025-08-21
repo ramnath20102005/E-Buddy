@@ -7,7 +7,3 @@ services:
     envVars:
       - key: REACT_APP_API_URL
         value: https://e-buddy.onrender.com
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
