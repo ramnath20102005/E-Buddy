@@ -32,7 +32,12 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 const corsOptions = {
-  origin: true, // Temporarily allow all origins for immediate fix
+  origin: [
+    "https://e-buddy-frontend.onrender.com",
+    "http://localhost:1000",
+    "http://localhost:3000",
+    "http://localhost:5000"
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   credentials: true,
